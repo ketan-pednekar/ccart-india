@@ -25,26 +25,27 @@ Built on **CLIMADA** and anchored in transparent physical logic, **CCART v0.9** 
 
 ---
 
-## Overview
+## 📘 Overview
 
 CCART integrates the full cyclone‑impact workflow:
 
-- IBTrACS → CLIMADA hazard generation
-- District‑level hazard diagnostics
-- LitPop exposure extraction
-- Coastal tier logic for India
-- Tropical cyclone vulnerability curves
-- Raw CLIMADA impact engine
-- DLNA calibration (state‑level)
-- Hazard–Exposure Weighting Engine (HWE)
-- Multi‑cyclone runner for historical and synthetic storms
+- **IBTrACS → CLIMADA hazard generation**
+- **District-level hazard diagnostics**
+- **LitPop exposure extraction**
+- **Coastal tier logic for India**
+- **Tropical cyclone vulnerability curves**
+- **Raw CLIMADA impact engine**
+- **DLNA calibration** (state-level)
+- **Hazard–Exposure Weighting Engine (HWE)**
+- **Multi-cyclone runner** for historical and synthetic storms
 
 The engine is designed to be:
 
-- transparent (no black‑box steps)
-- reproducible (deterministic hazard + exposure + vulnerability)
-- extensible (multi‑state, multi‑cyclone, multi‑hazard)
-- collaboration‑ready
+- **transparent** — no black-box steps  
+- **reproducible** — deterministic hazard + exposure + vulnerability  
+- **extensible** — multi-state, multi-cyclone, multi-hazard  
+- **collaboration-ready**
+
 ---
 
 ## Repository Structure
