@@ -1,8 +1,10 @@
 # CCART: Cyclone Calibration and Risk Toolkit (India)
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-blue" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow" />
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
+</p>
 
 Open, transparent, and reproducible cyclone impact modelling for India
 CCART is an open‑source, modular engine for district‑level tropical cyclone impact modelling across India.
