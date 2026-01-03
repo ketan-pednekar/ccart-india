@@ -19,11 +19,9 @@ Built on **CLIMADA** and anchored in transparent physical logic, **CCART v0.9** 
 - **DLNA-based calibration** (Fani v0.9)
 - **Hazard–Exposure Weighting Engine (HWE)** for spatial allocation
 
-
 ---
 
-> **The goal is to build a national, open, reproducible cyclone impact platform  
-> that researchers, engineers, and policymakers can extend collaboratively.**
+**The goal is to build a national, open, reproducible cyclone impact platform that researchers, engineers, and policymakers can extend collaboratively.**
 
 ---
 
