@@ -92,7 +92,7 @@ from ccart import run_ccart_climada
 
 gdf = run_ccart_climada("fani", dlna_total=1.2e9)
 gdf.head()
-
+```
 
 ---
 ## 🗺️ Roadmap
