@@ -116,20 +116,20 @@ gdf.head()
 - Multi-hazard integration (rainfall, surge)
 
 ---
-## Topics
+## 🏷️ Topics
 
 `open-source` `geospatial` `cyclone` `india` `adaptation`  
 `climada` `climate-risk` `disaster-risk` `impact-modelling` `hazard-modelling`
 
----
-## Website
+## 🌐 Website
 
-Visit [www.ccartghg.com](https://www.ccartghg.com) for updates and future outreach.
+Visit [www.ccartghg.com](http://www.ccartghg.com) for updates and future outreach.
 
----
-## License
+## 📄 License
 
-This project is released under the MIT License. See `LICENSE` for details.
+This project is released under the **MIT License**.  
+See `LICENSE` for details.
+
 
 ---
 ## Contributing
