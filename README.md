@@ -59,7 +59,7 @@ pip install -r requirements.txt
 ````
 ## Usage
 
-See 'notebooks/CCART_pan_india_v1.ipynb' for a full example workflow.
+See `notebooks/CCART_pan_india_v1.ipynb` for a full example workflow.
 ---
 ## Roadmap
 - Fani v0.9 baseline (complete)
@@ -67,14 +67,19 @@ See 'notebooks/CCART_pan_india_v1.ipynb' for a full example workflow.
 - Pan‑India hazard engine
 - Sectoral expansion
 - Outreach and visual storytelling
+
 ---
 ## Topics
-'open-source' 'geospatial' 'cyclone' 'india' 'adaptation'  
-'climada' 'climate-risk' 'disaster-risk' 'impact-modelling' 'hazard-modelling'
+
+`open-source` `geospatial` `cyclone` `india` `adaptation`  
+`climada` `climate-risk` `disaster-risk` `impact-modelling` `hazard-modelling`
+
 ---
 ## Website
+
 Visit [www.ccartghg.com](https://www.ccartghg.com) for updates and future outreach.
+
 ---
 ## License
+
 This project is released under the MIT License. See LICENSE for details.
----
