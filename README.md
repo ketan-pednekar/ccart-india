@@ -48,7 +48,8 @@ The engine is designed to be:
 
 ---
 
-## Repository Structure
+## 📁 Repository Structure
+
 ```
 ccart/              # Python package (hazard, exposure, impact, HWE, calibration)
 notebooks/          # Example notebooks (Odisha v0.9, diagnostics, pan-India)
