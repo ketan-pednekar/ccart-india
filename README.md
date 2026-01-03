@@ -6,22 +6,19 @@
 
 
 Open, transparent, and reproducible cyclone impact modelling for India
-CCART is an open‑source, modular engine for district‑level tropical cyclone impact modelling across India.
-Built on CLIMADA and anchored in transparent physical logic, CCART v0.9 introduces:
 
-IBTrACS → CLIMADA hazard generation
+CCART is an open-source, modular engine for **district-level tropical cyclone impact modelling across India**.
 
-LitPop exposure extraction for any Indian state
+Built on **CLIMADA** and anchored in transparent physical logic, **CCART v0.9** introduces:
 
-India‑wide district boundaries
+- **IBTrACS → CLIMADA hazard generation**
+- **LitPop exposure extraction** for any Indian state
+- **India-wide district boundaries**
+- **Tropical cyclone vulnerability curves** (India-specific)
+- **Raw CLIMADA impact modelling**
+- **DLNA-based calibration** (Fani v0.9)
+- **Hazard–Exposure Weighting Engine (HWE)** for spatial allocation
 
-Tropical cyclone vulnerability curves (India‑specific)
-
-Raw CLIMADA impact modelling
-
-DLNA‑based calibration (Fani v0.9)
-
-Hazard–Exposure Weighting Engine (HWE) for spatial allocation
 
 The goal is to build a national, open, reproducible cyclone impact platform that researchers, engineers, and policymakers can extend collaboratively.
 ---
