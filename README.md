@@ -92,26 +92,26 @@ from ccart import run_ccart_climada
 
 gdf = run_ccart_climada("fani", dlna_total=1.2e9)
 gdf.head()
-```
+
 
 ---
-## Roadmap
+## 🗺️ Roadmap
 
-v0.9 (Current Release)
+**v0.9 (Current Release)**
 - Odisha baseline
 - Fani DLNA calibration
 - Hazard builder + exposure + vulnerability
 - Raw impact engine
 - HWE allocation
 
-v1.0 (Upcoming)
-- Pan‑India hazard engine
-- Pan‑India exposure extraction
-- Multi‑state calibration
+**v1.0 (Upcoming)**
+- Pan-India hazard engine
+- Pan-India exposure extraction
+- Multi-state calibration
 - Sectoral expansion (education, power, transport)
 - Visual storytelling + dashboards
 - Synthetic cyclone generator
-- Multi‑hazard integration (rainfall, surge)
+- Multi-hazard integration (rainfall, surge)
 
 ---
 ## Topics
