@@ -62,7 +62,7 @@ requirements.txt
 ```
 ---
 
-## Key Features
+## ⚙️ Key Features
 
 - CLIMADA‑based hazard builder (IBTrACS → TropCyclone)
 - District‑level hazard diagnostics (max/mean wind, centroid density)
