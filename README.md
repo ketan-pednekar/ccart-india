@@ -4,31 +4,53 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
-CCART (Cyclone Calibration and Risk Toolkit) is a modular, open‑source engine for district‑level cyclone impact modelling across India.  
-Built on CLIMADA, it enables transparent hazard diagnostics, exposure extraction, calibrated impact modelling, and spatial allocation using the Hazard–Exposure Weighting Engine (HWE).
+Open, transparent, and reproducible cyclone impact modelling for India
+CCART is an open‑source, modular engine for district‑level tropical cyclone impact modelling across India.
+Built on CLIMADA and anchored in transparent physical logic, CCART v0.9 introduces:
 
+IBTrACS → CLIMADA hazard generation
+
+LitPop exposure extraction for any Indian state
+
+India‑wide district boundaries
+
+Tropical cyclone vulnerability curves (India‑specific)
+
+Raw CLIMADA impact modelling
+
+DLNA‑based calibration (Fani v0.9)
+
+Hazard–Exposure Weighting Engine (HWE) for spatial allocation
+
+The goal is to build a national, open, reproducible cyclone impact platform that researchers, engineers, and policymakers can extend collaboratively.
 ---
 
 ## Overview
 
-CCART integrates:
+CCART integrates the full cyclone‑impact workflow:
 
-- IBTrACS → CLIMADA hazard generation  
-- LitPop exposure extraction  
-- India‑wide district boundaries  
-- Tropical cyclone vulnerability curves  
-- Raw CLIMADA impact modelling  
-- DLNA‑based calibration  
-- Hazard–Exposure Weighting Engine (HWE) for spatial allocation  
+- IBTrACS → CLIMADA hazard generation
+- District‑level hazard diagnostics
+- LitPop exposure extraction
+- Coastal tier logic for India
+- Tropical cyclone vulnerability curves
+- Raw CLIMADA impact engine
+- DLNA calibration (state‑level)
+- Hazard–Exposure Weighting Engine (HWE)
+- Multi‑cyclone runner for historical and synthetic storms
 
-The engine is designed to be transparent, reproducible, and extensible for multi‑cyclone, multi‑state analysis across India.
+The engine is designed to be:
 
+- transparent (no black‑box steps)
+- reproducible (deterministic hazard + exposure + vulnerability)
+- extensible (multi‑state, multi‑cyclone, multi‑hazard)
+- collaboration‑ready
 ---
 
 ## Repository Structure
 ```
-ccart/              # Python package (hazard, exposure, impact, HWE, etc.)
-notebooks/          # Example notebooks (Odisha, pan-India, diagnostics)
+ccart/              # Python package (hazard, exposure, impact, HWE, calibration)
+notebooks/          # Example notebooks (Odisha v0.9, diagnostics, pan-India)
 data/               # Sample data (districts, DLNA, LitPop subsets)
 docs/               # Documentation and outreach materials
 examples/           # Minimal working demos
@@ -38,16 +60,17 @@ requirements.txt
 ```
 ---
 
-## Features
+## Key Features
 
-- CLIMADA-based hazard builder (IBTrACS)
-- District-level hazard diagnostics
+- CLIMADA‑based hazard builder (IBTrACS → TropCyclone)
+- District‑level hazard diagnostics (max/mean wind, centroid density)
 - LitPop exposure extraction for any Indian state
-- Vulnerability curves for tropical cyclones
-- Raw impact engine (CLIMADA)
-- DLNA calibration engine
-- Hazard–Exposure Weighting Engine (HWE)
-- Multi-cyclone, multi-state runner
+- Coastal tier classification (Tier 1/2/3 + coastal score)
+- India‑specific vulnerability curves (Housing, Health, Infrastructure)
+- Raw CLIMADA impact engine
+- DLNA calibration engine (Fani v0.9 baseline)
+- Hazard–Exposure Weighting Engine (HWE) for spatial allocation
+- Multi‑cyclone runner (historical + synthetic storms)
 
 ---
 ```
@@ -59,14 +82,34 @@ pip install -r requirements.txt
 ````
 ## Usage
 
-See `notebooks/CCART_pan_india_v1.ipynb` for a full example workflow.
+See `notebooks/CCART_Odisha_v0.9.ipynb` for a full example workflow.
+
+A minimal example:
+```
+from ccart import run_ccart_climada
+
+gdf = run_ccart_climada("fani", dlna_total=1.2e9)
+gdf.head()
+```
+
 ---
 ## Roadmap
-- Fani v0.9 baseline (complete)
-- DLNA calibration modules (in progress)
+
+v0.9 (Current Release)
+- Odisha baseline
+- Fani DLNA calibration
+- Hazard builder + exposure + vulnerability
+- Raw impact engine
+- HWE allocation
+
+v1.0 (Upcoming)
 - Pan‑India hazard engine
-- Sectoral expansion
-- Outreach and visual storytelling
+- Pan‑India exposure extraction
+- Multi‑state calibration
+- Sectoral expansion (education, power, transport)
+- Visual storytelling + dashboards
+- Synthetic cyclone generator
+- Multi‑hazard integration (rainfall, surge)
 
 ---
 ## Topics
@@ -82,16 +125,24 @@ Visit [www.ccartghg.com](https://www.ccartghg.com) for updates and future outrea
 ---
 ## License
 
-This project is released under the MIT License. See LICENSE for details.
+This project is released under the MIT License. See `LICENSE` for details.
 
 ---
 ## Contributing
 
-CCART welcomes collaboration from climate scientists, engineers, and geospatial analysts.  
-Please open an Issue or start a Discussion to get involved.
+CCART welcomes collaboration from:
+
+- climate scientists
+- geospatial analysts
+- engineers
+- modellers
+- open‑source contributors
+
+Open an `Issue` or start a `Discussion` to get involved.
 
 ---
 ## Releases
 
 - [v0.9 – Fani baseline](https://github.com/ketan-pednekar/ccart-india/releases)
 
+      
