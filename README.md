@@ -26,7 +26,7 @@ The engine is designed to be transparent, reproducible, and extensible for multi
 ---
 ```
 ## Repository Structure
-
+```
 ccart/              # Python package (hazard, exposure, impact, HWE, etc.)
 notebooks/          # Example notebooks (Odisha, pan-India, diagnostics)
 data/               # Sample data (districts, DLNA, LitPop subsets)
