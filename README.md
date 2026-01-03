@@ -50,34 +50,30 @@ requirements.txt
 - Multi-cyclone, multi-state runner
 
 ---
-
+```
 ## Installation
 
 ```bash
 pip install -r requirements.txt
 ````
----
-Usage
+````
+## Usage
 See notebooks/CCART_pan_india_v1.ipynb for a full example workflow.
 ---
-Roadmap
-Fani v0.9 baseline (complete)
-
-DLNA calibration modules (in progress)
-
-Pan‑India hazard engine
-
-Sectoral expansion
-
-Outreach and visual storytelling
+## Roadmap
+- Fani v0.9 baseline (complete)
+- DLNA calibration modules (in progress)
+- Pan‑India hazard engine
+- Sectoral expansion
+- Outreach and visual storytelling
 ---
-Topics
-open-source geospatial cyclone india adaptation  
-climada climate-risk disaster-risk impact-modelling hazard-modelling
+## Topics
+'open-source' 'geospatial' 'cyclone' 'india' 'adaptation'  
+'climada' 'climate-risk' 'disaster-risk' 'impact-modelling' 'hazard-modelling'
 ---
-Website
-Visit https://www.ccartghg.com for updates and future outreach.
+## Website
+Visit [www.ccartghg.com](https://www.ccartghg.com) for updates and future outreach.
 ---
-License
+## License
 This project is released under the MIT License. See LICENSE for details.
 ---
