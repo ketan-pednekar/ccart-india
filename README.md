@@ -24,7 +24,7 @@ CCART integrates:
 The engine is designed to be transparent, reproducible, and extensible for multi‑cyclone, multi‑state analysis across India.
 
 ---
-```
+
 ## Repository Structure
 ```
 ccart/              # Python package (hazard, exposure, impact, HWE, etc.)
