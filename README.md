@@ -80,19 +80,20 @@ requirements.txt
 
 ```bash
 pip install -r requirements.txt
-````
+
 ````
 ## Usage
 
-See `notebooks/CCART_Odisha_v0.9.ipynb` for a full example workflow.
+To explore CCART in action, see `notebooks/CCART_Odisha_v0.9.ipynb` for a full example workflow.
 
 A minimal example:
-```
+
+```python
 from ccart import run_ccart_climada
 
 gdf = run_ccart_climada("fani", dlna_total=1.2e9)
 gdf.head()
-```
+
 
 ---
 ## 🗺️ Roadmap
