@@ -64,15 +64,15 @@ requirements.txt
 
 ## ⚙️ Key Features
 
-- CLIMADA‑based hazard builder (IBTrACS → TropCyclone)
-- District‑level hazard diagnostics (max/mean wind, centroid density)
-- LitPop exposure extraction for any Indian state
-- Coastal tier classification (Tier 1/2/3 + coastal score)
-- India‑specific vulnerability curves (Housing, Health, Infrastructure)
-- Raw CLIMADA impact engine
-- DLNA calibration engine (Fani v0.9 baseline)
-- Hazard–Exposure Weighting Engine (HWE) for spatial allocation
-- Multi‑cyclone runner (historical + synthetic storms)
+- **CLIMADA-based hazard builder** (`IBTrACS → TropCyclone`)
+- **District-level hazard diagnostics** (max/mean wind, centroid density)
+- **LitPop exposure extraction** for any Indian state
+- **Coastal tier classification** (Tier 1/2/3 + coastal score)
+- **India-specific vulnerability curves** (Housing, Health, Infrastructure)
+- **Raw CLIMADA impact engine**
+- **DLNA calibration engine** (Fani v0.9 baseline)
+- **Hazard–Exposure Weighting Engine (HWE)** for spatial allocation
+- **Multi-cyclone runner** (historical + synthetic storms)
 
 ---
 ```
