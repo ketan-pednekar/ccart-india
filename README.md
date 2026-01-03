@@ -58,7 +58,8 @@ pip install -r requirements.txt
 ````
 ````
 ## Usage
-See notebooks/CCART_pan_india_v1.ipynb for a full example workflow.
+
+See 'notebooks/CCART_pan_india_v1.ipynb' for a full example workflow.
 ---
 ## Roadmap
 - Fani v0.9 baseline (complete)
