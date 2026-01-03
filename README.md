@@ -132,21 +132,20 @@ See `LICENSE` for details.
 
 
 ---
-## Contributing
+## 🤝 Contributing
 
 CCART welcomes collaboration from:
 
-- climate scientists
-- geospatial analysts
-- engineers
-- modellers
-- open‑source contributors
+- climate scientists  
+- geospatial analysts  
+- engineers  
+- modellers  
+- open-source contributors
 
-Open an `Issue` or start a `Discussion` to get involved.
+Open an **Issue** or start a **Discussion** to get involved.
 
----
-## Releases
+## 🚀 Releases
 
-- [v0.9 – Fani baseline](https://github.com/ketan-pednekar/ccart-india/releases)
+- **v0.9** – Fani baseline
 
       
