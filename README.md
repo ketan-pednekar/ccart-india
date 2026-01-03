@@ -83,3 +83,15 @@ Visit [www.ccartghg.com](https://www.ccartghg.com) for updates and future outrea
 ## License
 
 This project is released under the MIT License. See LICENSE for details.
+
+---
+## Contributing
+
+CCART welcomes collaboration from climate scientists, engineers, and geospatial analysts.  
+Please open an Issue or start a Discussion to get involved.
+
+---
+## Releases
+
+- [v0.9 – Fani baseline](https://github.com/ketan-pednekar/ccart-india/releases)
+
