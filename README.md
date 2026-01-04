@@ -151,20 +151,23 @@ data/fani_impact_short.xlsx
 
 (Full DLNA datasets are not included due to licensing considerations.)
 
+---
 ## 🏷️ Topics
 
 `open-source` `geospatial` `cyclone` `india` `adaptation`  
 `climada` `climate-risk` `disaster-risk` `impact-modelling` `hazard-modelling`
 
+---
+
 ## 🌐 Website
 
 Visit [www.ccartghg.com](http://www.ccartghg.com) for updates and future outreach.
 
+---
 ## 📄 License
 
 This project is released under the **MIT License**.  
 See `LICENSE` for details.
-
 
 ---
 ## 🤝 Contributing
@@ -176,6 +179,8 @@ CCART welcomes collaboration from:
 - engineers  
 - modellers  
 - open-source contributors
+
+---
 
 Open an **Issue** or start a **Discussion** to get involved.
 
