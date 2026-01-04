@@ -1,0 +1,11 @@
+numpy
+pandas
+geopandas
+xarray
+rasterio
+shapely
+matplotlib
+climada-python
+tqdm
+scipy
+pyproj
