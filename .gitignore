@@ -1,3 +1,13 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+.env
+.env/
+*.env
+
+.DS_Store
+
 # Data files
 data/*.nc
 data/*.xlsx
