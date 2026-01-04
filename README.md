@@ -116,6 +116,41 @@ gdf.head()
 - Multi-hazard integration (rainfall, surge)
 
 ---
+
+## 📂 Data Sources
+
+CCART relies on a combination of open datasets and curated inputs.  
+Large datasets are **not included** in this repository to keep the project lightweight.
+
+### 🌪️ Tropical Cyclone Tracks (IBTrACS)
+
+The full IBTrACS dataset can be downloaded from NOAA:  
+https://www.ncei.noaa.gov/products/international-best-track-archive
+
+For development and testing, place the downloaded file in:
+
+```
+data/IBTRACS.ALL.v04r01.nc
+```
+
+### 🗺️ Administrative Boundaries
+
+Odisha district boundaries (GeoJSON) should be placed in:
+
+```
+data/ODISHA_DISTRICTS.geojson
+```
+
+### 📊 DLNA / PDNA (Fani)
+
+A cleaned version of the DLNA/PDNA file for Cyclone Fani should be placed in:
+
+```
+data/fani_impact_short.xlsx
+```
+
+(Full DLNA datasets are not included due to licensing considerations.)
+
 ## 🏷️ Topics
 
 `open-source` `geospatial` `cyclone` `india` `adaptation`  
