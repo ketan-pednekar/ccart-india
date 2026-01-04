@@ -99,21 +99,45 @@ gdf.head()
 
 ## 🗺️ Roadmap
 
-**v0.9 (Current Release)**
-- Odisha baseline
+### **v0.9 — Odisha Prototype (Current Release)**
+- Odisha baseline engine
 - Fani DLNA calibration
 - Hazard builder + exposure + vulnerability
-- Raw impact engine
-- HWE allocation
+- Raw CLIMADA impact engine
+- District-level HWE allocation
+- Reproducible, transparent workflow
 
-**v1.0 (Upcoming)**
-- Pan-India hazard engine
-- Pan-India exposure extraction
-- Multi-state calibration
-- Sectoral expansion (education, power, transport)
-- Visual storytelling + dashboards
-- Synthetic cyclone generator
+---
+
+### **v1.0 — Pan‑India Reproducible Module (Upcoming)**
+- Pan‑India hazard engine (IBTrACS → CLIMADA)
+- Pan‑India exposure extraction (LitPop + boundaries)
+- Multi-state calibration framework
+- Sectoral expansion (housing, health, education, power, transport)
+- Unified CCART engine for any Indian cyclone
+- Visual storytelling + dashboards for states
+- Synthetic cyclone generator (baseline version)
 - Multi-hazard integration (rainfall, surge)
+
+---
+
+### **v1.1 — QGIS + TCFD‑Ready Impact Layers**
+- Export district-level impacts as GeoJSON / GPKG
+- QGIS-ready hazard, exposure, and impact layers
+- Company-wise and asset-class-wise reporting
+- TCFD/ISSB-aligned physical risk outputs
+- Higher-resolution exposure integration (LitPop 1 km or custom assets)
+- Improved spatial accuracy for district and sub-district impacts
+
+---
+
+### **v2.0 — Data‑Driven Damage Estimation (Future)**
+- Centroid-level ML models using satellite/QGIS features
+- SAR/Nightlights-based damage detection for training labels
+- Hybrid physical + ML vulnerability module
+- Probabilistic impact distributions
+- Scenario-based climate risk projections (CMIP6)
+- Synthetic cyclone ensembles for adaptation planning
 
 ---
 
