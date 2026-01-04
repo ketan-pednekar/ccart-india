@@ -127,7 +127,7 @@ Large datasets are **not included** in this repository to keep the project light
 The full IBTrACS dataset can be downloaded from NOAA:  
 https://www.ncei.noaa.gov/products/international-best-track-archive
 
-For development and testing, place the downloaded file in:
+Place the downloaded file in:
 
 ```
 data/IBTRACS.ALL.v04r01.nc
