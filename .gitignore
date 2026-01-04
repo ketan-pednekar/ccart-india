@@ -1,7 +1,13 @@
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-.env
-.env/
-*.env
-.DS_Store
+# Data files
+data/*.nc
+data/*.xlsx
+data/*.csv
+data/*.geojson
+
+# Large outputs or logs
+*.log
+*.out
+*.tmp
+
+# VS Code settings
+.vscode/
