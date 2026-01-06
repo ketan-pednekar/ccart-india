@@ -104,6 +104,7 @@ gdf = run_ccart(
 
 print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
 
+```
 
 ## 🧭 CCART Pipeline
 
