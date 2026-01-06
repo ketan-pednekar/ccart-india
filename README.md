@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" />
 </p>
 
-Open, transparent, and reproducible cyclone impact modelling for India
+**A transparent, data‑driven platform for calibrated cyclone loss estimation to support climate risk decisions across India.**
 
 CCART is an open-source, modular engine for **district-level tropical cyclone impact modelling across India**.
 
