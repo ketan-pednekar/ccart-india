@@ -1,5 +1,24 @@
 # CCART: Cyclone Calibration and Risk Toolkit (India)
 
+<p align="left">
+  <a href="https://github.com/ketan-pednekar/ccart-india">
+    <img src="https://img.shields.io/badge/status-active-success" alt="Project Status">
+  </a>
+  <a href="https://github.com/ketan-pednekar/ccart-india/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT">
+  </a>
+  <a href="https://github.com/ketan-pednekar/ccart-india/stargazers">
+    <img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/ketan-pednekar/ccart-india/issues">
+    <img src="https://img.shields.io/github/issues/ketan-pednekar/ccart-india" alt="Issues">
+  </a>
+  <a href="https://github.com/ketan-pednekar/ccart-india/commits/main">
+    <img src="https://img.shields.io/github/last-commit/ketan-pednekar/ccart-india" alt="Last Commit">
+  </a>
+</p>
+
+
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
