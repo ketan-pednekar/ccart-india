@@ -106,7 +106,6 @@ print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
 
 ## 🧭 CCART Pipeline
 
-```
 ┌────────────────────┐
 │   IBTrACS Track    │
 │   + CMIP6 (opt.)   │
@@ -141,8 +140,6 @@ print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
 │  Final Outputs     │
 │  (District Losses) │
 └────────────────────┘
-
-```
 
 ## **Usage**
 
