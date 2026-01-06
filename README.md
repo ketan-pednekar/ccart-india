@@ -80,13 +80,32 @@ requirements.txt
 
 ---
 ```
-## Installation
+## **Installation**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+## 🚀 **Quickstart**
+
+Once installed, you can run a calibrated cyclone impact analysis with just a few lines of code:
+
+```python
+from ccart.engine import run_ccart
+
+gdf = run_ccart(
+    cyclone_name="Fani",
+    storm_id="2019116N02090",
+    ibtracs_path="data/IBTRACS.ALL.v04r01.nc",
+    districts_path="data/INDIA_DISTRICTS.geojson",
+    dlna_total=4.2e9,
+    state_name="ODISHA"
+)
+
+print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
+
+
+## **Usage**
 
 To explore CCART in action, see `notebooks/CCART_Odisha_v0.9.ipynb` for a full example workflow.
 
