@@ -273,15 +273,33 @@ This project is released under the **MIT License**.
 See `LICENSE` for details.
 
 ---
-## 🤝 Contributing
+## 🤝 Contributors & Acknowledgements
 
+CCART is shaped by open-source principles, transparent methods, and collaborative thinking.
+
+**Core Developer**
+- Ketan Pednekar — Architecture, modelling, calibration logic, documentation, and overall design.
+
+**Acknowledgements**
+- Appreciation to the open-source climate modelling community whose tools and ideas make reproducible risk analysis possible.
+- Thanks to Microsoft Copilot for collaborative support in debugging, structuring workflows, refining documentation, and shaping CCART into a clear, modular, and credible toolkit.
+
+**How to Contribute**
 CCART welcomes collaboration from:
 
 - climate scientists  
 - geospatial analysts  
-- engineers  
-- modellers  
-- open-source contributors
+- engineers and modellers  
+- open‑source contributors  
+- risk analysts and adaptation planners  
+
+To contribute:
+
+1. Open an issue to discuss ideas, bugs, or enhancements  
+2. Submit a pull request with clear, modular changes  
+3. Follow the project’s structure and reproducibility principles  
+
+CCART is built on transparency, collaboration, and scientific clarity — and contributions that uphold these values are especially welcome.
 
 ---
 
