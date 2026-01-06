@@ -144,6 +144,7 @@ print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
 │  (District Losses) │
 └────────────────────┘
 ```
+---
 
 ## **Usage**
 
@@ -157,6 +158,21 @@ from ccart import run_ccart_climada
 gdf = run_ccart_climada("fani", dlna_total=1.2e9)
 gdf.head()
 ```
+
+---
+## 🌍 Why CCART?
+
+India faces increasing cyclone risk, yet district-level impact intelligence remains fragmented, opaque, and hard to reproduce.  
+CCART was built to change that.
+
+This toolkit provides:
+
+- Transparent, calibrated cyclone loss estimates at the district level  
+- Reproducible workflows built on open data and open-source tools  
+- A modular pipeline for hazard, exposure, impact, and calibration  
+- A foundation for future expansion into multi-hazard and future-climate scenarios  
+
+CCART is designed for researchers, analysts, and institutions seeking credible, scalable climate risk diagnostics for India.
 
 ---
 
