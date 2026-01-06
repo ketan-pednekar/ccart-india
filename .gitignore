@@ -1,23 +1,22 @@
+# Python cache
 __pycache__/
 *.pyc
-.ipynb_checkpoints/
 
-.env
-.env/
-*.env
+# Build artifacts
+*.egg-info/
 
-.DS_Store
-
-# Data files
+# Data (large or sensitive)
 data/*.nc
-data/*.xlsx
-data/*.csv
+data/*.tif
+data/*.grib
 data/*.geojson
+*.nc
+*.tif
+*.grib
+*.geojson
 
-# Large outputs or logs
-*.log
-*.out
-*.tmp
-
-# VS Code settings
+# VS Code
 .vscode/
+
+# Notebook checkpoints
+.ipynb_checkpoints/

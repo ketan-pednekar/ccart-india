@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ccart"
+version = "0.1.0"
+description = "CCART: Climate Catastrophe Analysis and Risk Toolkit"
+authors = [
+    { name = "Ketan" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["ccart"]
