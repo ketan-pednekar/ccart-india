@@ -80,13 +80,13 @@ requirements.txt
 
 ---
 ```
-## **Installation**
+## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🚀 **Quickstart**
+## 🚀 Quickstart
 
 Once installed, you can run a calibrated cyclone impact analysis with just a few lines of code:
 
