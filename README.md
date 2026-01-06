@@ -104,6 +104,45 @@ gdf = run_ccart(
 
 print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
 
+## 🧭 CCART Pipeline
+
+```
+┌────────────────────┐
+│   IBTrACS Track    │
+│   + CMIP6 (opt.)   │
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│  Hazard Module     │
+│  (Windfield, HWE)  │
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│  Exposure Module   │
+│ (District Geometry)│
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│  Impact Module     │
+│ (Raw Losses)       │
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│ Calibration Module │
+│ (DLNA Alignment)   │
+└─────────┬──────────┘
+│
+▼
+┌────────────────────┐
+│  Final Outputs     │
+│  (District Losses) │
+└────────────────────┘
+
+```
 
 ## **Usage**
 
