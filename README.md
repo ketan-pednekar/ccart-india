@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue" />
   <img src="https://img.shields.io/badge/License-MIT-yellow" />
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
+  <img src="https://img.shields.io/badge/Release-v0.9-orange" />
   <img src="https://img.shields.io/github/last-commit/ketan-pednekar/ccart-india" />
   <img src="https://img.shields.io/github/issues/ketan-pednekar/ccart-india" />
   <img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" />
