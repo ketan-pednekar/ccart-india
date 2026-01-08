@@ -255,6 +255,11 @@ data/fani_impact_short.xlsx
 
 (Full DLNA datasets are not included due to licensing considerations.)
 
+### 🗺️ INDIA SHAPEFILES
+
+INDIAN‑SHAPEFILES by datta07 on GitHub — used for district‑level administrative boundaries of India.
+These boundaries are incorporated solely for research, modelling, and non‑commercial analysis within the CCART project.
+
 ---
 ## 🏷️ Topics
 
