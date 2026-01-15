@@ -200,7 +200,7 @@ CCART is designed for researchers, analysts, and institutions seeking credible, 
 
 ---
 
-### **v1.1 — QGIS + TCFD‑Ready Impact Layers**
+### v1.1 — QGIS + TCFD‑Ready Impact Layers
 - Export district-level impacts as GeoJSON / GPKG
 - QGIS-ready hazard, exposure, and impact layers
 - Company-wise and asset-class-wise reporting
