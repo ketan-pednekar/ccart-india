@@ -14,7 +14,7 @@
 
 CCART is an open-source, modular engine for **district-level tropical cyclone impact modelling across India**.
 
-Built on **CLIMADA** and anchored in transparent physical logic, **CCART v0.9** introduces:
+Built on **CLIMADA** and anchored in transparent physical logic, **CCART v1.0** introduces:
 
 - **Multi‑cyclone calibration** (Amphan, Fani, Nisarga, Phailin, Tauktae)
 - **District‑level hazard diagnostics**
