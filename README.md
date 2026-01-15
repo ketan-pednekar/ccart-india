@@ -16,14 +16,11 @@ CCART is an open-source, modular engine for **district-level tropical cyclone im
 
 Built on **CLIMADA** and anchored in transparent physical logic, **CCART v0.9** introduces:
 
-- **IBTrACS → CLIMADA hazard generation**
-- **LitPop exposure extraction** for any Indian state
-- **India-wide district boundaries**
-- **Tropical cyclone vulnerability curves** (India-specific)
-- **Raw CLIMADA impact modelling**
-- **DLNA-based calibration** (Fani v0.9)
-- **Hazard–Exposure Weighting Engine (HWE)** for spatial allocation
-
+- **Multi‑cyclone calibration** (Amphan, Fani, Nisarga, Phailin, Tauktae)
+- **District‑level hazard diagnostics**
+- **Hazard–Weighted Exposure (HWE)** for spatial allocation
+- **DLNA‑aligned calibration** for historical events
+- **Reproducible, deterministic workflows** for hazard → exposure → vulnerability → impact
 ---
 
 **The goal is to build a national, open, reproducible cyclone impact platform that researchers, engineers, and policymakers can extend collaboratively.**
@@ -50,6 +47,22 @@ The engine is designed to be:
 - **reproducible** — deterministic hazard + exposure + vulnerability  
 - **extensible** — multi-state, multi-cyclone, multi-hazard  
 - **collaboration-ready**
+
+---
+## 🌀 Cyclones Included in v1.0 
+| Cyclone | Year | DLNA (USD) | Key Impact Corridor       | 
+|---------|------|------------|---------------------------| 
+| Amphan  | 2020 | 13.0B      | Kolkata–Sundarbans        | 
+| Fani    | 2019 | 4.2B       | Odisha coastal–urban belt | 
+| Nisarga | 2020 | 803M       | Raigad–Ratnagiri          | 
+| Phailin | 2013 | 4.15B      | Ganjam–Khordha corridor   | 
+| Tauktae | 2021 | 1.575B     | Saurashtra coast          | 
+
+**Each cyclone includes:** 
+- District‑level calibrated loss table
+- Choropleth map
+- Narrative summary
+- HWE diagnostics
 
 ---
 
