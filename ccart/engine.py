@@ -1,93 +1,116 @@
 """
-CCART v1.0 — Engine Orchestrator (India-ready)
-----------------------------------------------
+CCART v1.4 — Engine Orchestrator (India-ready, with hazard floor + robust district handling)
 
-This module ties together all CCART components into a single
-end-to-end workflow using a full-India district GeoJSON.
-
-Steps:
-1. Load full-India districts
-2. Filter to target state
-3. Load LitPop exposure
-4. Build hazard (IBTrACS → CLIMADA)
-5. Compute district-level hazard statistics
-6. Compute raw CLIMADA impact
-7. Aggregate losses to districts
-8. Calibrate to DLNA/PDNA totals
-9. Apply Hazard–Exposure Weighting Engine (HWE)
-10. Return final district-level GeoDataFrame
+- Uses a canonical 'district_norm' key internally for all merges.
+- Normalizes 'district' and 'state' from the input GeoJSON.
+- Keeps original 'district' and 'state' columns for readability.
 """
 
+from typing import Optional
+
 import geopandas as gpd
+import pandas as pd
 
 from .hazard import build_hazard, compute_district_hazard_stats
 from .exposure import load_litpop_for_state
 from .vulnerability import build_vulnerability_curves
-from .impact import compute_raw_impact, attach_losses_to_points, aggregate_district_loss
+from .impact import (
+    compute_raw_impact,
+    attach_losses_to_points,
+    aggregate_district_loss,
+)
 from .calibration import calibrate_to_total
 from .hwe import build_hwe_weights
 
 
-def run_ccart(cyclone_name: str,
-              storm_id: str,
-              ibtracs_path: str,
-              districts_path: str,
-              dlna_total: float,
-              state_name: str,
-              country_code: str = "IND"):
-    """
-    Run the full CCART v1.0 engine for a single cyclone and state,
-    using a full-India district GeoJSON.
+# Simple, physically motivated hazard floor (m/s)
+HAZARD_FLOOR_MS = 25.0   # adjust as needed
 
-    Parameters
-    ----------
-    cyclone_name : str
-        Human-readable cyclone name (e.g., "Fani").
-    storm_id : str
-        IBTrACS storm identifier.
-    ibtracs_path : str
-        Path to IBTrACS NetCDF file.
-    districts_path : str
-        Path to full-India district boundary GeoJSON.
-    dlna_total : float
-        State-level DLNA/PDNA total loss (USD).
-    state_name : str
-        Target state name (case-insensitive, e.g., "ODISHA").
-    country_code : str
-        ISO country code for LitPop (default: "IND").
 
-    Returns
-    -------
-    GeoDataFrame
-        District-level calibrated and HWE losses with geometry.
-    """
+def _normalize_name(s: pd.Series) -> pd.Series:
+    """Normalize district/state names to a canonical form."""
+    return (
+        s.astype(str)
+         .str.strip()
+         .str.upper()
+         .str.replace(r"\s+", " ", regex=True)
+    )
+
+
+def run_ccart(
+    cyclone_name: str,
+    storm_id: str,
+    ibtracs_path: str,
+    districts_path: str,
+    dlna_total: float,
+    state_name: str,
+    country_code: str = "IND",
+    inland_clip_km: Optional[float] = None,
+    coastline_path: Optional[str] = None,
+):
 
     # ------------------------------------------------------------
     # 1. Load full-India districts
     # ------------------------------------------------------------
     gdf_all = gpd.read_file(districts_path)
 
-    # Standardize names
-    gdf_all["district"] = gdf_all["district"].astype(str).str.strip()
-    gdf_all["state"] = gdf_all["state"].astype(str).str.strip()
+    # Ensure required columns exist
+    if "district" not in gdf_all.columns or "state" not in gdf_all.columns:
+        raise KeyError(
+            "Expected columns 'district' and 'state' in districts file, "
+            f"found: {list(gdf_all.columns)}"
+        )
 
-    # Filter to target state
-    mask = gdf_all["state"].str.upper() == state_name.strip().upper()
-    gdf_state = gdf_all[mask].copy()
+    # Normalize names
+    gdf_all["district"] = gdf_all["district"].astype(str)
+    gdf_all["state"] = gdf_all["state"].astype(str)
 
-    if len(gdf_state) == 0:
-        raise ValueError(f"No districts found for state: {state_name}")
+    gdf_all["district_norm"] = _normalize_name(gdf_all["district"])
+    gdf_all["state_norm"] = _normalize_name(gdf_all["state"])
 
-    # Ensure CRS is EPSG:4326
+    state_norm = _normalize_name(pd.Series([state_name])).iloc[0]
+    mask_state = gdf_all["state_norm"] == state_norm
+    gdf_state = gdf_all[mask_state].copy()
+
+    if gdf_state.empty:
+        raise ValueError(
+            f"No districts found for state: {state_name} "
+            f"(normalized: {state_norm})"
+        )
+
+    # Ensure CRS is WGS84
     if gdf_state.crs is None or gdf_state.crs.to_string() != "EPSG:4326":
         gdf_state = gdf_state.to_crs("EPSG:4326")
 
-    # Standardize district column for CCART modules
-    gdf_state["District"] = gdf_state["district"].astype(str).str.strip()
+    # Canonical district key for all merges
+    gdf_state["District"] = gdf_state["district_norm"]
+
     districts = gdf_state[["District", "geometry"]].copy()
 
     # ------------------------------------------------------------
-    # 2. Load LitPop exposure for the state
+    # 1B. Optional inland distance clipping
+    # ------------------------------------------------------------
+    inland_clipping_active = inland_clip_km is not None and coastline_path is not None
+
+    if inland_clipping_active:
+        coast = gpd.read_file(coastline_path)
+        if coast.crs is None or coast.crs.to_string() != "EPSG:4326":
+            coast = coast.to_crs("EPSG:4326")
+
+        districts_proj = districts.to_crs("EPSG:3857")
+        coast_proj = coast.to_crs("EPSG:3857")
+
+        centroids_proj = districts_proj.geometry.centroid
+        dist_to_coast_m = centroids_proj.distance(coast_proj.unary_union)
+
+        districts["dist_to_coast_km"] = dist_to_coast_m / 1000.0
+        districts["is_inland"] = districts["dist_to_coast_km"] > inland_clip_km
+    else:
+        districts["dist_to_coast_km"] = None
+        districts["is_inland"] = False
+
+    # ------------------------------------------------------------
+    # 2. Load LitPop exposure
     # ------------------------------------------------------------
     assets_state, exp_dist = load_litpop_for_state(country_code, districts)
 
@@ -100,6 +123,19 @@ def run_ccart(cyclone_name: str,
     # 4. District-level hazard statistics
     # ------------------------------------------------------------
     hazard_stats = compute_district_hazard_stats(hazard, districts)
+
+    # ------------------------------------------------------------
+    # 4B. Apply hazard floor (corrected column name)
+    # ------------------------------------------------------------
+    if "WindSpeed_Max_mps" in hazard_stats.columns:
+        hazard_stats["hazard_ok"] = (
+            hazard_stats["WindSpeed_Max_mps"] >= HAZARD_FLOOR_MS
+        )
+    else:
+        raise KeyError(
+            "WindSpeed_Max_mps not found in hazard_stats. "
+            "Check compute_district_hazard_stats output."
+        )
 
     # ------------------------------------------------------------
     # 5. Vulnerability curves
@@ -122,38 +158,104 @@ def run_ccart(cyclone_name: str,
     district_loss_raw = aggregate_district_loss(exp_with_loss, districts)
 
     # ------------------------------------------------------------
-    # 9. Calibration
+    # 8B. Inland clipping BEFORE calibration
     # ------------------------------------------------------------
-    district_loss_cal = calibrate_to_total(district_loss_raw, dlna_total)
+    if inland_clipping_active:
+        loss_with_flag = district_loss_raw.merge(
+            districts[["District", "is_inland"]],
+            on="District",
+            how="left",
+        )
+
+        coastal = loss_with_flag[loss_with_flag["is_inland"] == False].copy()
+        inland = loss_with_flag[loss_with_flag["is_inland"] == True].copy()
+
+        coastal = coastal.drop(columns=["is_inland"])
+        inland = inland.drop(columns=["is_inland"])
+
+        coastal_cal = calibrate_to_total(coastal, dlna_total)
+
+        inland_cal = inland.copy()
+        inland_cal["loss_usd_cal"] = 0.0
+
+        district_loss_cal = pd.concat([coastal_cal, inland_cal], ignore_index=True)
+
+    else:
+        district_loss_cal = calibrate_to_total(district_loss_raw, dlna_total)
 
     # ------------------------------------------------------------
-    # 10. HWE weights
+    # 8C. Apply hazard floor to calibrated losses
+    # ------------------------------------------------------------
+    district_loss_cal = district_loss_cal.merge(
+        hazard_stats[["District", "hazard_ok"]],
+        on="District",
+        how="left",
+    )
+    district_loss_cal.loc[district_loss_cal["hazard_ok"] == False, "loss_usd_cal"] = 0.0
+    district_loss_cal = district_loss_cal.drop(columns=["hazard_ok"])
+
+    # ------------------------------------------------------------
+    # 9. HWE weights
     # ------------------------------------------------------------
     hwe_weights = build_hwe_weights(hazard_stats, exp_dist)
 
     # ------------------------------------------------------------
-    # 11. Merge calibrated + HWE with geometry
+    # 9B. Inland clipping for HWE
+    # ------------------------------------------------------------
+    if inland_clipping_active:
+        hwe_with_flag = hwe_weights.merge(
+            districts[["District", "is_inland"]],
+            on="District",
+            how="left",
+        )
+
+        hwe_with_flag.loc[hwe_with_flag["is_inland"] == True, "HWE_weight_norm"] = 0.0
+
+        total_coastal_weight = hwe_with_flag["HWE_weight_norm"].sum()
+        if total_coastal_weight > 0:
+            hwe_with_flag["HWE_weight_norm"] /= total_coastal_weight
+
+        hwe_weights = hwe_with_flag.drop(columns=["is_inland"])
+
+    # ------------------------------------------------------------
+    # 9C. Apply hazard floor to HWE weights
+    # ------------------------------------------------------------
+    hwe_weights = hwe_weights.merge(
+        hazard_stats[["District", "hazard_ok"]],
+        on="District",
+        how="left",
+    )
+    hwe_weights.loc[hwe_weights["hazard_ok"] == False, "HWE_weight_norm"] = 0.0
+
+    total_weight = hwe_weights["HWE_weight_norm"].sum()
+    if total_weight > 0:
+        hwe_weights["HWE_weight_norm"] /= total_weight
+
+    hwe_weights = hwe_weights.drop(columns=["hazard_ok"])
+
+    # ------------------------------------------------------------
+    # 10. Merge calibrated + HWE with geometry + original names
     # ------------------------------------------------------------
     merged = districts.merge(district_loss_cal, on="District", how="left")
     merged = merged.merge(
         hwe_weights[["District", "HWE_weight_norm"]],
         on="District",
-        how="left"
+        how="left",
     )
-
-    # Add state column back
     merged = merged.merge(
-        gdf_state[["District", "state"]],
+        gdf_state[["District", "district", "state"]],
         on="District",
-        how="left"
+        how="left",
     )
 
     # ------------------------------------------------------------
-    # 12. Compute HWE losses
+    # 11. Compute HWE losses
     # ------------------------------------------------------------
     merged["loss_usd_hwe"] = merged["HWE_weight_norm"] * dlna_total
 
-    # Fill missing values
     merged = merged.fillna(0)
+
+    # For convenience, expose a nice 'District' label column
+    merged = merged.rename(columns={"district": "District_label"})
 
     return merged
