@@ -326,6 +326,18 @@ Open an **Issue** or start a **Discussion** to get involved.
 
 ## 🚀 Releases
 
-- **v0.9** – Fani baseline
+- **v1.0** – Multi‑cyclone calibrated release  
+  - Added Amphan, Fani, Nisarga, Phailin, and Tauktae  
+  - Introduced Hazard–Weighted Exposure (HWE)  
+  - Implemented hazard floor and inland clipping  
+  - Added district‑level calibrated loss tables  
+  - Added standardized cyclone maps and narratives  
+  - Published CCART v1.0 slide carousel  
+  - Repository restructured for clarity and reproducibility  
+
+- **v0.9** – Fani baseline  
+  - Initial prototype of CCART  
+  - First implementation of hazard ingestion, exposure, and vulnerability  
+  - Early calibration workflow  
 
       
