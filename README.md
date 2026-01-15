@@ -191,26 +191,12 @@ CCART is designed for researchers, analysts, and institutions seeking credible, 
 ---
 
 ## 🗺️ Roadmap
-
-### **v0.9 — Odisha Prototype (Current Release)**
-- Odisha baseline engine
-- Fani DLNA calibration
-- Hazard builder + exposure + vulnerability
-- Raw CLIMADA impact engine
-- District-level HWE allocation
-- Reproducible, transparent workflow
-
----
-
-### **v1.0 — Pan‑India Reproducible Module (Upcoming)**
+### **v1.0 — Pan‑India Reproducible Module **
 - Pan‑India hazard engine (IBTrACS → CLIMADA)
 - Pan‑India exposure extraction (LitPop + boundaries)
 - Multi-state calibration framework
-- Sectoral expansion (housing, health, education, power, transport)
 - Unified CCART engine for any Indian cyclone
 - Visual storytelling + dashboards for states
-- Synthetic cyclone generator (baseline version)
-- Multi-hazard integration (rainfall, surge)
 
 ---
 
