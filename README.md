@@ -97,14 +97,46 @@ CCART v1.1 expands the platform from 5 calibrated cyclones to a full
 ## 📁 Repository Structure
 
 ```
-ccart/              # Python package (hazard, exposure, impact, HWE, calibration)
-notebooks/          # Example notebooks (Odisha v0.9, diagnostics, pan-India)
-data/               # Sample data (districts, DLNA, LitPop subsets)
-docs/               # Documentation and outreach materials
-examples/           # Minimal working demos
+ccart/                      # Core Python package (hazard, exposure, impact, HWE, calibration)
+    engine.py
+    viz.py
+    utils.py
+    __init__.py
+
+examples/                   # Fully reproducible cyclone scripts (all 15 events)
+    run_aila.py
+    run_laila.py
+    run_phailin.py
+    run_helen.py
+    run_hudhud.py
+    run_vardah.py
+    run_ockhi.py
+    run_titli.py
+    run_gaja.py
+    run_fani.py
+    run_bulbul.py
+    run_amphan.py
+    run_nisarga.py
+    run_tauktae.py
+    run_yaas.py
+
+data/                       # Lightweight sample + model outputs
+    INDIA_DISTRICTS.geojson
+    coastl_ind.shp
+    cyclone_metadata.csv
+    district_relationships_master.csv      # NEW in v1.1 (15‑cyclone calibrated dataset)
+    cyclone_level_summary.csv              # NEW in v1.1 (cross‑cyclone diagnostics)
+
+notebooks/                  # Example workflows and diagnostics
+    CCART_Odisha_v0.9.ipynb
+    CCART_PanIndia_Diagnostics.ipynb       # optional future addition
+
+docs/                       # Documentation, figures, outreach materials
+
 README.md
 LICENSE
 requirements.txt
+
 ```
 ---
 
