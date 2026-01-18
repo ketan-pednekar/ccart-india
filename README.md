@@ -270,7 +270,7 @@ For each cyclone:
 loss_usd_calibrated = loss_usd_raw * raw_to_dlna_ratio
 ```
 
-This preserves **spatial patterns** from physics while matching total observed losses.
+This preserves **spatial patterns** from physics while matching **total observed losses**.
 
 **Why this method is scientifically defensible**
 - It maintains **physical gradients** from the hazard field.
