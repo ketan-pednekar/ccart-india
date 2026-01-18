@@ -297,6 +297,7 @@ This preserves **spatial patterns** from physics while matching **total observed
 ---
 
 ##⚠️ Known Limitations
+
 CCART v1.1 is a calibrated, reproducible cyclone‑impact toolkit, but several methodological and data‑driven constraints remain. These will be addressed in future releases.
 
 **1. Hazard resolution and windfield assumptions**
