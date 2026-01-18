@@ -233,7 +233,8 @@ gdf.head()
 ```
 ---
 
-## 🔬 Scientific Notes: Understanding raw_to_dlna_ratio
+## 🔬 Scientific Notes: Understanding ```raw_to_dlna_ratio```
+
 CCART uses a transparent, reproducible calibration step to align CLIMADA’s **raw physical loss estimates** with **observed DLNA/PDNA totals** for each cyclone.
 
 This is expressed through a simple but powerful scaling factor:
@@ -262,7 +263,7 @@ The ratio corrects for these structural gaps.
 For each cyclone:
 - Compute **raw_climada_loss** (sum of district‑level raw losses).
 - Retrieve **DLNA_total** from official/state reports.
-- Compute the scaling factor '''raw_to_dlna_ratio'''.
+- Compute the scaling factor ```raw_to_dlna_ratio```.
 - Multiply each district’s raw loss by this factor:
 
 ```
@@ -288,10 +289,10 @@ This preserves **spatial patterns** from physics while matching total observed l
   - DLNA methodology
 
 **Where the ratio appears in CCART**
-- '''district_relationships_master.csv'''
-- '''cyclone_level_summary.csv'''
-- All example scripts in '''examples/'''
-- The calibration module inside '''ccart/engine.py'''
+- ```district_relationships_master.csv```
+- ```cyclone_level_summary.csv```
+- All example scripts in ```examples/```
+- The calibration module inside ```ccart/engine.py```
 
 ---
 ## 🌍 Why CCART?
