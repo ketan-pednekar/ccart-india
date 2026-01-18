@@ -1,0 +1,11 @@
+sid,name,year,basin,landfall_state,landfall_date,dlna_available,litpop_ready,comments
+2020136N10088,AMPHAN,2020,BoB,West Bengal,5/20/2020,yes,yes,"Landfall near Digha, WB"
+2019116N02090,FANI,2019,BoB,Odisha,5/3/2019,yes,yes,"Landfall near Puri, Odisha"
+2020153N13072,NISARGA,2020,AS,Maharashtra,6/3/2020,yes,yes,"Landfall near Alibag, Maharashtra"
+2013281N12098,PHAILIN,2013,BoB,Odisha,10/12/2013,yes,yes,"Landfall near Gopalpur, Odisha"
+2021133N10071,TAUKTAE,2021,AS,Gujarat,5/17/2021,yes,yes,"Landfall near Diu/Saurashtra coast, Gujarat"
+2014279N11096,HUDHUD,2014,BoB,ANDHRA PRADESH,10/12/2014,yes,yes,"Landfall near Visakhapatnam; India-only DLNA ≈ USD 3.5B (Nepal excluded)"
+2021143N15090,YAAS,2021,BoB,ODISHA,5/26/2021,yes,yes,"Landfall near Balasore; India DLNA ≈ USD 2.99B"
+2018281N14088,TITLI,2018,BoB,ODISHA,10/11/2018,yes,yes,"Landfall near Palasa; DLNA ≈ USD 920M; major impact in Ganjam, Gajapati, Rayagada"
+2019302N11118,BULBUL,2019,BoB,WEST BENGAL,11/9/2019,yes,yes,"Landfall near Sagar Island; DLNA ≈ USD 3.2B (WB+Odisha)"
+2018314N12093,GAJA,2018,BoB,TAMIL NADU,11/16/2018,yes,yes,"Landfall near Vedaranyam; India DLNA ≈ USD 1.6B"

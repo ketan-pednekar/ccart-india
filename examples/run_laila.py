@@ -8,15 +8,15 @@ import os
 print("Engine file:", engine.run_ccart.__code__.co_filename)
 print("Hazard floor:", engine.HAZARD_FLOOR_MS)
 
-# === Run CCART for Cyclone Tauktae ===
+# === Run CCART for Cyclone Laila ===
 gdf = run_ccart(
-    cyclone_name="Tauktae",
-    storm_id="2021133N10071",   # Confirmed SID
+    cyclone_name="Laila",
+    storm_id="2010137N10090",   # Correct SID for Laila
     ibtracs_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\IBTRACS.ALL.v04r01.nc",
     districts_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\INDIA_DISTRICTS.geojson",
 
-    dlna_total=1000e6,          # India DLNA ≈ USD 1.0B
-    state_name="GUJARAT",
+    dlna_total=600e6,           # India DLNA ≈ USD 0.6B
+    state_name="ANDHRA PRADESH",
     inland_clip_km=150,
     coastline_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\coastl_ind.shp"
 )
@@ -50,11 +50,12 @@ print(
 # === EXPORT TO MASTER RELATIONSHIP CSV ===
 master_path = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\district_relationships_master.csv"
 
-sid = "2021133N10071"
-cyclone_name = "Tauktae"
-year = 2021
-dlna_total = 1000e6
-calibration_state = "GUJARAT"
+# === CYCLONE METADATA ===
+sid = "2010137N10090"
+cyclone_name = "Laila"
+year = 2010
+dlna_total = 600e6
+calibration_state = "ANDHRA PRADESH"
 
 gdf["sid"] = sid
 gdf["cyclone_name"] = cyclone_name
@@ -74,7 +75,7 @@ out = gdf[cols].copy()
 # === REMOVE OLD ROWS FOR THIS SID (IF ANY) ===
 if os.path.exists(master_path):
     master = pd.read_csv(master_path)
-    master = master[master["sid"] != sid]   # keep everything except this cyclone
+    master = master[master["sid"] != sid]
     master = pd.concat([master, out], ignore_index=True)
     master.to_csv(master_path, index=False)
 else:
@@ -94,8 +95,8 @@ if gdf["loss_usd_hwe"].sum() > 0:
         df_losses,
         district_col="District",
         loss_col="loss",
-        state_filter="GUJARAT",
-        title="Cyclone Tauktae – CCART Loss Map (Gujarat)"
+        state_filter="ANDHRA PRADESH",
+        title="Cyclone Laila – CCART Loss Map (Andhra Pradesh)"
     )
 else:
     print("No positive losses — skipping choropleth.")

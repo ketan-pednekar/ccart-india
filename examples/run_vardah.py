@@ -8,15 +8,15 @@ import os
 print("Engine file:", engine.run_ccart.__code__.co_filename)
 print("Hazard floor:", engine.HAZARD_FLOOR_MS)
 
-# === Run CCART for Cyclone Tauktae ===
+# === Run CCART for Cyclone Vardah ===
 gdf = run_ccart(
-    cyclone_name="Tauktae",
-    storm_id="2021133N10071",   # Confirmed SID
+    cyclone_name="Vardah",
+    storm_id="2016341N08092",   # SID for Vardah
     ibtracs_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\IBTRACS.ALL.v04r01.nc",
     districts_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\INDIA_DISTRICTS.geojson",
 
     dlna_total=1000e6,          # India DLNA ≈ USD 1.0B
-    state_name="GUJARAT",
+    state_name="TAMIL NADU",
     inland_clip_km=150,
     coastline_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\coastl_ind.shp"
 )
@@ -48,13 +48,17 @@ print(
 )
 
 # === EXPORT TO MASTER RELATIONSHIP CSV ===
+import os
+import pandas as pd
+
 master_path = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\district_relationships_master.csv"
 
-sid = "2021133N10071"
-cyclone_name = "Tauktae"
-year = 2021
+# === CYCLONE METADATA (EDIT PER CYCLONE) ===
+sid = "2016341N08092"
+cyclone_name = "Vardah"
+year = 2016
 dlna_total = 1000e6
-calibration_state = "GUJARAT"
+calibration_state = "TAMIL NADU"
 
 gdf["sid"] = sid
 gdf["cyclone_name"] = cyclone_name
@@ -81,21 +85,3 @@ else:
     out.to_csv(master_path, index=False)
 
 print(f"Saved {len(out)} rows for SID {sid} without duplication.")
-
-# === MAP ===
-df_losses = (
-    gdf[["District", "loss_usd_hwe"]]
-    .rename(columns={"loss_usd_hwe": "loss"})
-)
-
-if gdf["loss_usd_hwe"].sum() > 0:
-    ccart_choropleth(
-        gdf,
-        df_losses,
-        district_col="District",
-        loss_col="loss",
-        state_filter="GUJARAT",
-        title="Cyclone Tauktae – CCART Loss Map (Gujarat)"
-    )
-else:
-    print("No positive losses — skipping choropleth.")

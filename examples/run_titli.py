@@ -8,15 +8,15 @@ import os
 print("Engine file:", engine.run_ccart.__code__.co_filename)
 print("Hazard floor:", engine.HAZARD_FLOOR_MS)
 
-# === Run CCART for Cyclone Tauktae ===
+# === Run CCART for Cyclone Titli ===
 gdf = run_ccart(
-    cyclone_name="Tauktae",
-    storm_id="2021133N10071",   # Confirmed SID
+    cyclone_name="Titli",
+    storm_id="2018281N14088",   # Confirmed SID
     ibtracs_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\IBTRACS.ALL.v04r01.nc",
     districts_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\INDIA_DISTRICTS.geojson",
 
-    dlna_total=1000e6,          # India DLNA ≈ USD 1.0B
-    state_name="GUJARAT",
+    dlna_total=920e6,           # India DLNA ≈ USD 920M
+    state_name="ODISHA",
     inland_clip_km=150,
     coastline_path=r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\coastl_ind.shp"
 )
@@ -50,11 +50,11 @@ print(
 # === EXPORT TO MASTER RELATIONSHIP CSV ===
 master_path = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\data\district_relationships_master.csv"
 
-sid = "2021133N10071"
-cyclone_name = "Tauktae"
-year = 2021
-dlna_total = 1000e6
-calibration_state = "GUJARAT"
+sid = "2018281N14088"
+cyclone_name = "Titli"
+year = 2018
+dlna_total = 920e6
+calibration_state = "ODISHA"
 
 gdf["sid"] = sid
 gdf["cyclone_name"] = cyclone_name
@@ -94,8 +94,8 @@ if gdf["loss_usd_hwe"].sum() > 0:
         df_losses,
         district_col="District",
         loss_col="loss",
-        state_filter="GUJARAT",
-        title="Cyclone Tauktae – CCART Loss Map (Gujarat)"
+        state_filter="ODISHA",
+        title="Cyclone Titli – CCART Loss Map (Odisha)"
     )
 else:
     print("No positive losses — skipping choropleth.")
