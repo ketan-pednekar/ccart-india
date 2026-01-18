@@ -23,6 +23,16 @@ Built on CLIMADA and anchored in transparent physical logic, CCART v1.0 introduc
 - **Hazard–Weighted Exposure (HWE)** for spatial allocation
 - **DLNA‑aligned calibration** for historical events
 - **Reproducible, deterministic workflows** for hazard → exposure → vulnerability → impact
+
+## What’s New in v1.1
+- Added 15 calibrated historical cyclones (2009–2021)
+- Added district_relationships_master.csv (full India, 15 events)
+- Added cyclone_level_summary.csv (cross‑cyclone diagnostics)
+- Added export‑enabled scripts for all cyclones
+- Added SID‑anchored metadata for every event
+- Standardized all cyclone workflows under CCART v1.0 engine
+- Improved reproducibility and documentation
+
 ---
 
 **The goal is to build a national, open, reproducible cyclone impact platform that researchers, engineers, and policymakers can extend collaboratively.**
