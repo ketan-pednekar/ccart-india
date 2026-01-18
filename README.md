@@ -293,10 +293,9 @@ This preserves **spatial patterns** from physics while matching **total observed
 - ```cyclone_level_summary.csv```
 - All example scripts in ```examples/```
 - The calibration module inside ```ccart/engine.py```
-
 ---
 
-##⚠️ Known Limitations
+## ⚠️ Known Limitations
 
 CCART v1.1 is a calibrated, reproducible cyclone‑impact toolkit, but several methodological and data‑driven constraints remain. These will be addressed in future releases.
 
