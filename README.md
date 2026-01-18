@@ -10,11 +10,13 @@
   <img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" />
 </p>
 
-**A transparent, data‑driven platform for calibrated cyclone loss estimation to support climate risk decisions across India.**
+**CCART v1.1 — Pan‑India 15‑Cyclone Calibrated Release**
 
-CCART is an open-source, modular engine for **district-level tropical cyclone impact modelling across India**.
+A transparent, data‑driven platform for calibrated cyclone loss estimation to support climate risk decisions across India.
 
-Built on **CLIMADA** and anchored in transparent physical logic, **CCART v1.0** introduces:
+CCART is an open-source, modular engine for district-level tropical cyclone impact modelling across India.
+
+Built on CLIMADA and anchored in transparent physical logic, CCART v1.0 introduces:
 
 - **Multi‑cyclone calibration** (Amphan, Fani, Nisarga, Phailin, Tauktae)
 - **District‑level hazard diagnostics**
