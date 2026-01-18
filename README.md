@@ -372,18 +372,33 @@ Open an **Issue** or start a **Discussion** to get involved.
 
 ## 🚀 Releases
 
-- **v1.0** – Multi‑cyclone calibrated release  
-  - Added Amphan, Fani, Nisarga, Phailin, and Tauktae  
-  - Introduced Hazard–Weighted Exposure (HWE)  
-  - Implemented hazard floor and inland clipping  
-  - Added district‑level calibrated loss tables  
-  - Added standardized cyclone maps and narratives  
-  - Published CCART v1.0 slide carousel  
-  - Repository restructured for clarity and reproducibility  
+v1.1 – Pan‑India 15‑Cyclone Calibrated Release
 
-- **v0.9** – Fani baseline  
-  - Initial prototype of CCART  
-  - First implementation of hazard ingestion, exposure, and vulnerability  
-  - Early calibration workflow  
+- Added **15 calibrated historical cyclones** (2009–2021) covering both Bay of Bengal and Arabian Sea basins
+- Added **district_relationships_master.csv** (full India, 15‑event calibrated dataset)
+- Added **cyclone_level_summary.csv** (cross‑cyclone diagnostics: raw loss, calibrated loss, DLNA ratios)
+- Added **export‑enabled scripts** for all 15 cyclones under a unified CCART v1.0 engine
+- Added **SID‑anchored metadata** for every cyclone
+- Standardized all cyclone workflows for reproducibility and transparency
+- Improved documentation and repository structure for national‑scale analysis
+
+
+v1.0 – Multi‑cyclone calibrated release
+
+- Added Amphan, Fani, Nisarga, Phailin, and Tauktae
+- Introduced Hazard–Weighted Exposure (HWE)
+- Implemented hazard floor and inland clipping
+- Added district‑level calibrated loss tables
+- Added standardized cyclone maps and narratives
+- Published CCART v1.0 slide carousel
+- Repository restructured for clarity and reproducibility
+
+
+v0.9 – Fani baseline
+
+- Initial prototype of CCART
+- First implementation of hazard ingestion, exposure, and vulnerability
+- Early calibration workflow
+
 
       
