@@ -61,20 +61,36 @@ The engine is designed to be:
 - **collaboration-ready**
 
 ---
-## 🌀 Cyclones Included in v1.0 
-| Cyclone | Year | DLNA (USD) | Key Impact Corridor       | 
-|---------|------|------------|---------------------------| 
-| Amphan  | 2020 | 13.0B      | Kolkata–Sundarbans        | 
-| Fani    | 2019 | 4.2B       | Odisha coastal–urban belt | 
-| Nisarga | 2020 | 803M       | Raigad–Ratnagiri          | 
-| Phailin | 2013 | 4.15B      | Ganjam–Khordha corridor   | 
-| Tauktae | 2021 | 1.575B     | Saurashtra coast          | 
+🌀 Cyclones Included in v1.1
 
-**Each cyclone includes:** 
-- District‑level calibrated loss table
-- Choropleth map
-- Narrative summary
-- HWE diagnostics
+CCART v1.1 expands the platform from 5 calibrated cyclones to a full
+15‑cyclone national dataset covering all major Indian landfalls from 2009–2021.
+
+| Cyclone | Year | DLNA (USD) | State |
+|--------|------|------------|--------|
+| Aila | 2009 | 1.2B | West Bengal |
+| Laila | 2010 | 0.6B | Andhra Pradesh |
+| Phailin | 2013 | 4.15B | Odisha |
+| Helen | 2013 | 0.5B | Andhra Pradesh |
+| Hudhud | 2014 | 3.5B | Andhra Pradesh |
+| Vardah | 2016 | 1.0B | Tamil Nadu |
+| Ockhi | 2017 | 0.9B | Kerala |
+| Titli | 2018 | 0.92B | Odisha |
+| Gaja | 2018 | 1.6B | Tamil Nadu |
+| Fani | 2019 | 4.2B | Odisha |
+| Bulbul | 2019 | 3.2B | West Bengal |
+| Amphan | 2020 | 13.0B | West Bengal |
+| Nisarga | 2020 | 0.6B | Maharashtra |
+| Tauktae | 2021 | 1.0B | Gujarat |
+| Yaas | 2021 | 2.99B | Odisha |
+
+**Each cyclone includes:**
+
+- District‑level calibrated loss table  
+- Choropleth map  
+- Narrative summary  
+- HWE diagnostics  
+
 
 ---
 
