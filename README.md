@@ -234,7 +234,7 @@ gdf.head()
 ---
 
 ## 🔬 Scientific Notes: Understanding raw_to_dlna_ratio
-CCART uses a transparent, reproducible calibration step to align CLIMADA’s raw physical loss estimates with observed DLNA/PDNA totals for each cyclone.
+CCART uses a transparent, reproducible calibration step to align CLIMADA’s **raw physical loss estimates** with **observed DLNA/PDNA totals** for each cyclone.
 
 This is expressed through a simple but powerful scaling factor:
 ```
@@ -248,7 +248,7 @@ Why this ratio exists
 - exposure (LitPop)
 - vulnerability curves
 
-However, raw physical losses rarely match observed post‑disaster assessments because DLNAs include:
+However, raw physical losses rarely match **observed** post‑disaster assessments because DLNAs include:
 - indirect losses
 - infrastructure damage
 - service disruption
@@ -260,21 +260,21 @@ The ratio corrects for these structural gaps.
 **How CCART applies the ratio**
 
 For each cyclone:
-- Compute raw_climada_loss (sum of district‑level raw losses).
-- Retrieve DLNA_total from official/state reports.
-- Compute the scaling factor raw_to_dlna_ratio.
+- Compute **raw_climada_loss** (sum of district‑level raw losses).
+- Retrieve **DLNA_total** from official/state reports.
+- Compute the scaling factor '''raw_to_dlna_ratio'''.
 - Multiply each district’s raw loss by this factor:
 
 ```
 loss_usd_calibrated = loss_usd_raw * raw_to_dlna_ratio
 ```
 
-This preserves spatial patterns from physics while matching total observed losses.
+This preserves **spatial patterns** from physics while matching total observed losses.
 
 **Why this method is scientifically defensible**
-- It maintains physical gradients from the hazard field.
+- It maintains **physical gradients** from the hazard field.
 - It avoids arbitrary redistribution or manual adjustments.
-- It ensures district‑level losses sum exactly to DLNA totals.
+- It ensures **district‑level losses sum exactly** to DLNA totals.
 - It is reproducible, deterministic, and transparent.
 - It allows cross‑cyclone comparability (v1.1’s 15‑event dataset).
 
@@ -288,10 +288,10 @@ This preserves spatial patterns from physics while matching total observed losse
   - DLNA methodology
 
 **Where the ratio appears in CCART**
-- district_relationships_master.csv
-- cyclone_level_summary.csv
-- All example scripts in examples/
-- The calibration module inside ccart/engine.py
+- '''district_relationships_master.csv'''
+- '''cyclone_level_summary.csv'''
+- All example scripts in '''examples/'''
+- The calibration module inside '''ccart/engine.py'''
 
 ---
 ## 🌍 Why CCART?
