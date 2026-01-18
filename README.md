@@ -368,33 +368,42 @@ CCART is designed for researchers, analysts, and institutions seeking credible, 
 
 ---
 
-## 🗺️ Roadmap
-### **v1.0 — Pan‑India Reproducible Module**
-- Pan‑India hazard engine (IBTrACS → CLIMADA)
-- Pan‑India exposure extraction (LitPop + boundaries)
-- Multi-state calibration framework
-- Unified CCART engine for any Indian cyclone
-- Visual storytelling + dashboards for states
+## 🧭 Roadmap (v1.2 → v2.0)
 
----
+### 1. Cross‑Cyclone Analysis Framework
+- multi-event consistency checks: compare hazard footprints, exposure patterns, and calibrated ratios across all 15 events  
+- bias diagnostics: identify systematic over/under-estimation patterns in raw CLIMADA losses  
+- state-level harmonization signals: detect discontinuities arising from DLNA methodology differences  
 
-### **v1.1 — QGIS + TCFD‑Ready Impact Layers**
-- Export district-level impacts as GeoJSON / GPKG
-- QGIS-ready hazard, exposure, and impact layers
-- Company-wise and asset-class-wise reporting
-- TCFD/ISSB-aligned physical risk outputs
-- Higher-resolution exposure integration (LitPop 1 km or custom assets)
-- Improved spatial accuracy for district and sub-district impacts
+### 2. Enhanced Exposure Diagnostics
+- LitPop refinement: evaluate rural/industrial under‑representation and explore hybrid proxies  
+- temporal exposure scaling: introduce year-specific economic scaling for historical events  
+- sectoral exposure layers: optional modules for agriculture, infrastructure, and housing  
 
----
+### 3. Vulnerability Curve Improvements
+- India-specific tuning: explore empirical adjustments using DLNA sector splits where available  
+- sectoral vulnerability options: allow users to select curves for residential, commercial, and infrastructure assets  
 
-### **v2.0 — Data‑Driven Damage Estimation (Future)**
-- Centroid-level ML models using satellite/QGIS features
-- SAR/Nightlights-based damage detection for training labels
-- Hybrid physical + ML vulnerability module
-- Probabilistic impact distributions
-- Scenario-based climate risk projections (CMIP6)
-- Synthetic cyclone ensembles for adaptation planning
+### 4. Calibration Architecture Upgrades
+- multi-state harmonization (optional): unified calibration for cyclones affecting multiple states  
+- border‑continuity adjustments: reduce artificial jumps in calibrated losses at state boundaries  
+- probabilistic calibration: introduce uncertainty ranges for hazard, exposure, and scaling  
+- Bayesian or multi-event optimization: reduce noise from DLNA variability  
+
+### 5. Spatial Visualization & QGIS Integration
+- ready-to-load layers: district-level calibrated losses, hazard footprints, and exposure diagnostics  
+- shared colorbars: consistent visualization across all 15 cyclones  
+- QGIS style templates: optional `.qml` files for hazard and impact layers  
+
+### 6. Documentation & Usability Enhancements
+- API-style documentation: clearer function-level explanations for hazard, exposure, and calibration modules  
+- example notebooks: reproducible workflows for 2–3 representative cyclones  
+- lightweight CLI: optional command-line interface for running full pipelines  
+
+### 7. Multi-Hazard Expansion (post v2.0)
+- flood module architecture (only after cyclone engine is fully validated)  
+- heatwave and landslide placeholders for future integration  
+- synthetic event generation: long-term goal for climate-conditioned hazard scenarios  
 
 ---
 
