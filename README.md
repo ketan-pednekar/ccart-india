@@ -91,7 +91,6 @@ CCART v1.1 expands the platform from 5 calibrated cyclones to a full
 - Narrative summary  
 - HWE diagnostics  
 
-
 ---
 
 ## 📁 Repository Structure
@@ -232,6 +231,66 @@ from ccart import run_ccart_climada
 gdf = run_ccart_climada("fani", dlna_total=1.2e9)
 gdf.head()
 ```
+---
+
+## 🔬 Scientific Notes: Understanding raw_to_dlna_ratio
+CCART uses a transparent, reproducible calibration step to align CLIMADA’s raw physical loss estimates with observed DLNA/PDNA totals for each cyclone.
+
+This is expressed through a simple but powerful scaling factor:
+```
+raw_to_dlna_ratio = DLNA_total / raw_climada_loss
+```
+Why this ratio exists
+
+**CLIMADA’s raw impact engine computes losses using:**
+
+- windfield intensity
+- exposure (LitPop)
+- vulnerability curves
+
+However, raw physical losses rarely match observed post‑disaster assessments because DLNAs include:
+- indirect losses
+- infrastructure damage
+- service disruption
+- agriculture and livelihood impacts
+- reporting and valuation differences
+
+The ratio corrects for these structural gaps.
+
+**How CCART applies the ratio**
+For each cyclone:
+- Compute raw_climada_loss (sum of district‑level raw losses).
+- Retrieve DLNA_total from official/state reports.
+- Compute the scaling factor raw_to_dlna_ratio.
+- Multiply each district’s raw loss by this factor:
+
+```
+loss_usd_calibrated = loss_usd_raw * raw_to_dlna_ratio
+```
+
+This preserves spatial patterns from physics while matching total observed losses.
+
+**Why this method is scientifically defensible**
+- It maintains physical gradients from the hazard field.
+- It avoids arbitrary redistribution or manual adjustments.
+- It ensures district‑level losses sum exactly to DLNA totals.
+- It is reproducible, deterministic, and transparent.
+- It allows cross‑cyclone comparability (v1.1’s 15‑event dataset).
+
+**Interpreting the ratio**
+- A ratio > 1 means CLIMADA under‑estimated losses (common for infrastructure‑heavy states).
+- A ratio < 1 means CLIMADA over‑estimated losses (rare, usually exposure‑driven).
+  - Ratios vary by cyclone due to differences in:
+  - track geometry
+  - exposure distribution
+  - vulnerability of built environment
+  - DLNA methodology
+
+**Where the ratio appears in CCART**
+- district_relationships_master.csv
+- cyclone_level_summary.csv
+- All example scripts in examples/
+- The calibration module inside ccart/engine.py
 
 ---
 ## 🌍 Why CCART?
