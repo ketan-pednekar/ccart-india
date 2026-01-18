@@ -258,6 +258,7 @@ However, raw physical losses rarely match observed post‑disaster assessments b
 The ratio corrects for these structural gaps.
 
 **How CCART applies the ratio**
+
 For each cyclone:
 - Compute raw_climada_loss (sum of district‑level raw losses).
 - Retrieve DLNA_total from official/state reports.
