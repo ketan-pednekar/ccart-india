@@ -338,6 +338,26 @@ This project is released under the **MIT License**.
 See `LICENSE` for details.
 
 ---
+## 📑 How to Cite CCART
+
+If you use CCART in research, analysis, or publications, please cite it as:
+```
+Pednekar, K. (2026). CCART: Cyclone Calibration and Risk Toolkit (India) – 
+Pan‑India 15‑Cyclone Calibrated Release (v1.1).
+https://github.com/<your‑repo‑path>
+```
+For general reference to the methodology:
+```
+Pednekar, K. (2026). A transparent, reproducible framework for district‑level 
+tropical cyclone impact modelling in India using CLIMADA, DLNA calibration, 
+and Hazard‑Weighted Exposure (HWE).
+```
+If you use specific datasets from the repository (e.g., district_relationships_master.csv or cyclone_level_summary.csv), please cite:
+```
+CCART Dataset (2026). District‑level calibrated cyclone impact dataset for 
+15 historical Indian cyclones (2009–2021). Part of CCART v1.1.
+```
+---
 ## 🤝 Contributors & Acknowledgements
 
 CCART is shaped by open-source principles, transparent methods, and collaborative thinking.
