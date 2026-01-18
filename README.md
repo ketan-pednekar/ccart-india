@@ -295,6 +295,63 @@ This preserves **spatial patterns** from physics while matching **total observed
 - The calibration module inside ```ccart/engine.py```
 
 ---
+
+##⚠️ Known Limitations
+CCART v1.1 is a calibrated, reproducible cyclone‑impact toolkit, but several methodological and data‑driven constraints remain. These will be addressed in future releases.
+
+**1. Hazard resolution and windfield assumptions**
+- CLIMADA’s parametric windfield is used without event‑specific reanalysis corrections.
+- Local terrain effects, micro‑scale wind variations, and sub‑district heterogeneity are not explicitly modelled.
+- Hazard footprints are generated at a uniform grid resolution, which may smooth local extremes.
+
+**2. Exposure data constraints (LitPop)**
+- LitPop is a proxy for asset distribution and may under‑represent:
+  - rural infrastructure
+  - informal settlements
+  - industrial clusters
+- Exposure is static and does not reflect year‑specific economic growth or structural change.
+
+**3. DLNA variability and reporting differences**
+- DLNA/PDNA totals vary widely in methodology across states and years.
+- Some DLNAs include indirect losses, while others focus on physical damage only.
+- Calibration inherits these inconsistencies, which can influence the raw_to_dlna_ratio.
+
+**4. District-level aggregation**
+- All calibrated losses are aggregated to district boundaries.
+- Sub‑district impacts (taluka/block/ward level) are not represented.
+- Districts with large geographic area may show diluted spatial gradients.
+
+**5. No explicit vulnerability curve tuning**
+- CCART v1.1 uses CLIMADA’s default tropical cyclone vulnerability curves.
+- No India‑specific or sector‑specific vulnerability calibration has been performed.
+- This may affect absolute loss levels before DLNA scaling.
+
+**6. Calibration is event-specific, not cross-event optimized**
+- Each cyclone is calibrated independently to its DLNA total.
+- No multi-event optimization or Bayesian calibration has been applied yet.
+- Ratios may therefore reflect DLNA noise rather than structural model bias.
+
+**7. No uncertainty quantification (yet)**
+- CCART v1.1 provides deterministic outputs.
+- Uncertainty ranges for hazard, exposure, and calibration are not included.
+- Future versions may incorporate ensemble windfields or probabilistic scaling.
+
+**8. Limited to historical cyclone tracks**
+- CCART v1.1 does not include:
+  - synthetic tracks
+  - climate‑change‑adjusted hazard projections
+  - return‑period curves
+- These will be part of the planned multi-hazard expansion.
+
+
+**9. Calibration is state-specific, not multi-state harmonized**
+- DLNA/PDNA reports are issued at the state level, each with its own methodology, sector definitions, and valuation practices.
+- CCART v1.1 calibrates each cyclone within the affected state(s) independently, without harmonizing cross‑state DLNA differences.
+- For cyclones affecting multiple states, calibrated losses reflect state-by-state scaling, not a unified multi-state calibration.
+- This may introduce discontinuities at state borders where DLNA methodologies differ.
+
+---
+
 ## 🌍 Why CCART?
 
 India faces increasing cyclone risk, yet district-level impact intelligence remains fragmented, opaque, and hard to reproduce.  
