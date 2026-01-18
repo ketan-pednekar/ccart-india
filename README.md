@@ -368,42 +368,22 @@ CCART is designed for researchers, analysts, and institutions seeking credible, 
 
 ---
 
-## 🧭 Roadmap (v1.2 → v2.0)
+## 🧭 Roadmap
 
-### 1. Cross‑Cyclone Analysis Framework
-- multi-event consistency checks: compare hazard footprints, exposure patterns, and calibrated ratios across all 15 events  
-- bias diagnostics: identify systematic over/under-estimation patterns in raw CLIMADA losses  
-- state-level harmonization signals: detect discontinuities arising from DLNA methodology differences  
+### **v1.2 — Multi‑State Calibration**
+- cross‑state harmonization for cyclones affecting multiple states  
+- optional unified scaling for multi‑state events  
+- exposure‑ or hazard‑weighted blending for state‑level calibration  
 
-### 2. Enhanced Exposure Diagnostics
-- LitPop refinement: evaluate rural/industrial under‑representation and explore hybrid proxies  
-- temporal exposure scaling: introduce year-specific economic scaling for historical events  
-- sectoral exposure layers: optional modules for agriculture, infrastructure, and housing  
+### **v2.0 — Synthetic Cyclone Expansion**
+- synthetic track generation to extend beyond historical events  
+- climate‑conditioned hazard scenarios for long‑term shifts  
+- return‑period curves for probabilistic risk layers  
 
-### 3. Vulnerability Curve Improvements
-- India-specific tuning: explore empirical adjustments using DLNA sector splits where available  
-- sectoral vulnerability options: allow users to select curves for residential, commercial, and infrastructure assets  
-
-### 4. Calibration Architecture Upgrades
-- multi-state harmonization (optional): unified calibration for cyclones affecting multiple states  
-- border‑continuity adjustments: reduce artificial jumps in calibrated losses at state boundaries  
-- probabilistic calibration: introduce uncertainty ranges for hazard, exposure, and scaling  
-- Bayesian or multi-event optimization: reduce noise from DLNA variability  
-
-### 5. Spatial Visualization & QGIS Integration
-- ready-to-load layers: district-level calibrated losses, hazard footprints, and exposure diagnostics  
-- shared colorbars: consistent visualization across all 15 cyclones  
-- QGIS style templates: optional `.qml` files for hazard and impact layers  
-
-### 6. Documentation & Usability Enhancements
-- API-style documentation: clearer function-level explanations for hazard, exposure, and calibration modules  
-- example notebooks: reproducible workflows for 2–3 representative cyclones  
-- lightweight CLI: optional command-line interface for running full pipelines  
-
-### 7. Multi-Hazard Expansion (post v2.0)
-- flood module architecture (only after cyclone engine is fully validated)  
-- heatwave and landslide placeholders for future integration  
-- synthetic event generation: long-term goal for climate-conditioned hazard scenarios  
+### **v3.0 — QGIS‑Based Machine Learning for TCFD Damage Estimation**
+- high‑resolution proxy layers (nightlights, land use, infrastructure density, etc.)  
+- ML models to estimate local damage where DLNA data is unavailable  
+- QGIS‑ready outputs for site‑level TCFD and adaptation assessments  
 
 ---
 
