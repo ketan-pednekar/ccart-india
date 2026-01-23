@@ -4,34 +4,29 @@
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue" />
   <img src="https://img.shields.io/badge/License-MIT-yellow" />
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Release-v0.9-orange" />
+  <img src="https://img.shields.io/badge/Release-v1.2-brightgreen" />
   <img src="https://img.shields.io/github/last-commit/ketan-pednekar/ccart-india" />
   <img src="https://img.shields.io/github/issues/ketan-pednekar/ccart-india" />
   <img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" />
 </p>
 
-**CCART v1.1 — Pan‑India 15‑Cyclone Calibrated Release**
+**CCART v1.2 — Pan‑India Multi‑State Automated Release**
 
-A transparent, data‑driven platform for calibrated cyclone loss estimation to support climate risk decisions across India.
+A transparent, reproducible, and India‑focused toolkit for district‑level tropical cyclone impact modelling.  
+CCART combines CLIMADA’s hazard engine with DLNA‑aligned calibration to produce credible, physics‑driven loss estimates across India.
 
-CCART is an open-source, modular engine for district-level tropical cyclone impact modelling across India.
+---
 
-Built on CLIMADA and anchored in transparent physical logic, CCART v1.0 introduces:
+## What’s New in v1.2
 
-- **Multi‑cyclone calibration** (Amphan, Fani, Nisarga, Phailin, Tauktae)
-- **District‑level hazard diagnostics**
-- **Hazard–Weighted Exposure (HWE)** for spatial allocation
-- **DLNA‑aligned calibration** for historical events
-- **Reproducible, deterministic workflows** for hazard → exposure → vulnerability → impact
+- **Metadata‑driven batch automation** for all 15 calibrated cyclones  
+- **SID‑anchored cyclone metadata** for reproducible multi‑state workflows  
+- **Automated state‑level slicing** and clean GeoJSON exports  
+- **All‑India master CSV** for each cyclone (district‑level hazard, exposure, impact)  
+- **Standardized logs** for every run  
+- **Dedicated `scripts/` folder** for each cyclone’s reproducible workflow  
 
-## What’s New in v1.1
-- Added 15 calibrated historical cyclones (2009–2021)
-- Added district_relationships_master.csv (full India, 15 events)
-- Added cyclone_level_summary.csv (cross‑cyclone diagnostics)
-- Added export‑enabled scripts for all cyclones
-- Added SID‑anchored metadata for every event
-- Standardized all cyclone workflows under CCART v1.0 engine
-- Improved reproducibility and documentation
+This release marks the transition from manual, cyclone‑specific scripts to a unified, automated national engine.
 
 ---
 
@@ -61,124 +56,111 @@ The engine is designed to be:
 - **collaboration-ready**
 
 ---
-🌀 Cyclones Included in v1.1
-
-CCART v1.1 expands the platform from 5 calibrated cyclones to a full
-15‑cyclone national dataset covering all major Indian landfalls from 2009–2021.
-
-| Cyclone | Year | DLNA (USD) | State |
-|--------|------|------------|--------|
-| Aila | 2009 | 1.2B | West Bengal |
-| Laila | 2010 | 0.6B | Andhra Pradesh |
-| Phailin | 2013 | 4.15B | Odisha |
-| Helen | 2013 | 0.5B | Andhra Pradesh |
-| Hudhud | 2014 | 3.5B | Andhra Pradesh |
-| Vardah | 2016 | 1.0B | Tamil Nadu |
-| Ockhi | 2017 | 0.9B | Kerala |
-| Titli | 2018 | 0.92B | Odisha |
-| Gaja | 2018 | 1.6B | Tamil Nadu |
-| Fani | 2019 | 4.2B | Odisha |
-| Bulbul | 2019 | 3.2B | West Bengal |
-| Amphan | 2020 | 13.0B | West Bengal |
-| Nisarga | 2020 | 0.6B | Maharashtra |
-| Tauktae | 2021 | 1.0B | Gujarat |
-| Yaas | 2021 | 2.99B | Odisha |
-
-**Each cyclone includes:**
-
-- District‑level calibrated loss table  
-- Choropleth map  
-- Narrative summary  
-- HWE diagnostics  
-
----
-
 ## 📁 Repository Structure
 
 ```
-ccart/                      # Core Python package (hazard, exposure, impact, HWE, calibration)
-    engine.py
-    viz.py
-    utils.py
-    __init__.py
-
-examples/                   # Fully reproducible cyclone scripts (all 15 events)
-    run_aila.py
-    run_laila.py
-    run_phailin.py
-    run_helen.py
-    run_hudhud.py
-    run_vardah.py
-    run_ockhi.py
-    run_titli.py
-    run_gaja.py
-    run_fani.py
-    run_bulbul.py
-    run_amphan.py
-    run_nisarga.py
-    run_tauktae.py
-    run_yaas.py
-
-data/                       # Lightweight sample + model outputs
-    INDIA_DISTRICTS.geojson
-    coastl_ind.shp
-    cyclone_metadata.csv
-    district_relationships_master.csv      # NEW in v1.1 (15‑cyclone calibrated dataset)
-    cyclone_level_summary.csv              # NEW in v1.1 (cross‑cyclone diagnostics)
-
-notebooks/                  # Example workflows and diagnostics
-    CCART_Odisha_v0.9.ipynb
-    CCART_PanIndia_Diagnostics.ipynb       # optional future addition
-
-docs/                       # Documentation, figures, outreach materials
-
-README.md
-LICENSE
-requirements.txt
-
+ccart-india/
+│
+├── ccart/                      # Core Python package
+│   ├── engine.py               # v1.2 unified engine (metadata-driven)
+│   ├── utils.py
+│   ├── viz.py
+│   └── __init__.py
+│
+├── scripts/                    # Reproducible cyclone runners (v1.2)
+│   ├── run_aila.py
+│   ├── run_amphan.py
+│   ├── run_bulbul.py
+│   ├── run_fani.py
+│   ├── run_gaja.py
+│   ├── run_helen.py
+│   ├── run_hudhud.py
+│   ├── run_laila.py
+│   ├── run_nisarga.py
+│   ├── run_ockhi.py
+│   ├── run_phailin.py
+│   ├── run_tauktae.py
+│   ├── run_titli.py
+│   ├── run_vardah.py
+│   └── run_yaas.py
+│
+├── scripts/run_all_cyclones.py     # Automated batch runner (v1.2)
+│
+├── examples/                   # Example scripts and notebooks
+│   ├── run_aila.py
+│   ├── run_amphan.py
+│   ├── run_bulbul.py
+│   ├── run_fani.py
+│   ├── run_gaja.py
+│   ├── run_helen.py
+│   ├── run_hudhud.py
+│   ├── run_laila.py
+│   ├── run_nisarga.py
+│   ├── run_ockhi.py
+│   ├── run_phailin.py
+│   ├── run_tauktae.py
+│   ├── run_titli.py
+│   ├── run_vardah.py
+│   ├── run_yaas.py
+│   └── CCART_v1.2_Diagnostics.ipynb
+│
+├── data/                       # Lightweight inputs + metadata
+│   ├── cyclone_metadata.csv
+│   ├── INDIA_DISTRICTS.geojson
+│   ├── coastl_ind.shp
+│   ├── district_relationships_master.csv
+│   ├── district_relationships_master_v1_2.csv   # Frozen v1.2 dataset
+│   └── cyclone_level_summary.csv
+│
+├── outputs/                    # Auto-generated outputs (empty in repo)
+│
+├── docs/                       # Documentation, figures, outreach
+│
+├── README.md
+├── LICENSE
+└── requirements.txt
 ```
 ---
 
 ## ⚙️ Key Features
-
-- **CLIMADA-based hazard builder** (`IBTrACS → TropCyclone`)
-- **District-level hazard diagnostics** (max/mean wind, centroid density)
-- **LitPop exposure extraction** for any Indian state
-- **Coastal tier classification** (Tier 1/2/3 + coastal score)
-- **India-specific vulnerability curves** (Housing, Health, Infrastructure)
-- **Raw CLIMADA impact engine**
-- **DLNA calibration engine** (Fani v0.9 baseline)
-- **Hazard–Exposure Weighting Engine (HWE)** for spatial allocation
-- **Multi-cyclone runner** (historical + synthetic storms)
-
+- CLIMADA-based hazard builder (IBTrACS to TropCyclone)
+- District-level hazard diagnostics (max wind, mean wind, centroid distance, inland clipping)
+- LitPop exposure extraction for any Indian state
+- Coastal tier classification (Tier 1, Tier 2, Tier 3, coastal proximity score)
+- India-specific vulnerability curves (housing, health, infrastructure)
+- Raw CLIMADA impact engine for physics-driven loss estimation
+- DLNA calibration module (state-level, SID-anchored, multi-state aware)
+- Hazard–Weighted Exposure Engine (HWE) for spatial allocation of calibrated losses
+- Metadata-driven multi-cyclone runner for all 15 calibrated cyclones
+- Reproducible v1.2 cyclone scripts for each historical event
+- National master dataset generation (district-level hazard, exposure, impact, calibration)
 ---
-```
+
 ## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
-
+---
 ## 🚀 Quickstart
 
-Once installed, you can run a calibrated cyclone impact analysis with just a few lines of code:
+CCART v1.2 provides reproducible, metadata‑driven scripts for running calibrated cyclone analyses.
+You can run a single cyclone or all 15 calibrated cyclones using the scripts included in the repository.
 
-```python
-from ccart.engine import run_ccart
-
-gdf = run_ccart(
-    cyclone_name="Fani",
-    storm_id="2019116N02090",
-    ibtracs_path="data/IBTRACS.ALL.v04r01.nc",
-    districts_path="data/INDIA_DISTRICTS.geojson",
-    dlna_total=4.2e9,
-    state_name="ODISHA"
-)
-
-print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
-
+### Run a single calibrated cyclone
+```
+python scripts/run_fani.py
 ```
 
+### Run all 15 calibrated cyclones
+```
+python scripts/run_all_cyclones.py
+```
+### Run an example script
+```
+python examples/run_fani.py
+```
+---
 ## 🧭 CCART Pipeline
 
 ```
@@ -221,26 +203,37 @@ print(gdf[["DIST_NAME", "loss_usd_raw", "loss_usd_calibrated"]])
 
 ## **Usage**
 
-To explore CCART in action, see `notebooks/CCART_Odisha_v0.9.ipynb` for a full example workflow.
+CCART v1.2 is built around reproducible, metadata‑driven workflows.
+All cyclone analyses are executed through the scripts included in the repository, which handle the full end‑to‑end pipeline automatically.
 
-A minimal example:
+### What the scripts do
+- load cyclone metadata
+- build the CLIMADA hazard
+- extract district‑level exposure
+- compute raw physical losses
+- apply DLNA calibration
+- generate district‑level outputs
+- update the national master dataset
 
-```python
-from ccart import run_ccart_climada
-
-gdf = run_ccart_climada("fani", dlna_total=1.2e9)
-gdf.head()
+### Where to explore the workflow
+You can inspect or modify the reproducible cyclone scripts in:
 ```
+scripts/
+```
+For lightweight demonstration and experimentation, use the example scripts in:
+```
+examples/
+```
+These examples show how to run a cyclone, inspect outputs, and explore intermediate diagnostics.
 ---
 
-## 🔬 Scientific Notes: Understanding ```raw_to_dlna_ratio```
+## 🔬 Scientific Notes: Understanding `raw_to_dlna_ratio`
 
 CCART uses a transparent, reproducible calibration step to align CLIMADA’s **raw physical loss estimates** with **observed DLNA/PDNA totals** for each cyclone.
 
 This is expressed through a simple but powerful scaling factor:
-```
-raw_to_dlna_ratio = DLNA_total / raw_climada_loss
-```
+`raw_to_dlna_ratio = DLNA_total / raw_climada_loss`
+
 Why this ratio exists
 
 **CLIMADA’s raw impact engine computes losses using:**
@@ -263,12 +256,10 @@ The ratio corrects for these structural gaps.
 For each cyclone:
 - Compute **raw_climada_loss** (sum of district‑level raw losses).
 - Retrieve **DLNA_total** from official/state reports.
-- Compute the scaling factor ```raw_to_dlna_ratio```.
+- Compute the scaling factor `raw_to_dlna_ratio`.
 - Multiply each district’s raw loss by this factor:
 
-```
-loss_usd_calibrated = loss_usd_raw * raw_to_dlna_ratio
-```
+`loss_usd_calibrated = loss_usd_raw * raw_to_dlna_ratio`
 
 This preserves **spatial patterns** from physics while matching **total observed losses**.
 
@@ -289,66 +280,20 @@ This preserves **spatial patterns** from physics while matching **total observed
   - DLNA methodology
 
 **Where the ratio appears in CCART**
-- ```district_relationships_master.csv```
-- ```cyclone_level_summary.csv```
-- All example scripts in ```examples/```
-- The calibration module inside ```ccart/engine.py```
+- `district_relationships_master.csv`
+- `cyclone_level_summary.csv`
+- All example scripts in `scripts/`
+- The calibration module inside `ccart/engine.py`
 ---
 
 ## ⚠️ Known Limitations
 
-CCART v1.1 is a calibrated, reproducible cyclone‑impact toolkit, but several methodological and data‑driven constraints remain. These will be addressed in future releases.
-
-**1. Hazard resolution and windfield assumptions**
-- CLIMADA’s parametric windfield is used without event‑specific reanalysis corrections.
-- Local terrain effects, micro‑scale wind variations, and sub‑district heterogeneity are not explicitly modelled.
-- Hazard footprints are generated at a uniform grid resolution, which may smooth local extremes.
-
-**2. Exposure data constraints (LitPop)**
-- LitPop is a proxy for asset distribution and may under‑represent:
-  - rural infrastructure
-  - informal settlements
-  - industrial clusters
-- Exposure is static and does not reflect year‑specific economic growth or structural change.
-
-**3. DLNA variability and reporting differences**
-- DLNA/PDNA totals vary widely in methodology across states and years.
-- Some DLNAs include indirect losses, while others focus on physical damage only.
-- Calibration inherits these inconsistencies, which can influence the raw_to_dlna_ratio.
-
-**4. District-level aggregation**
-- All calibrated losses are aggregated to district boundaries.
-- Sub‑district impacts (taluka/block/ward level) are not represented.
-- Districts with large geographic area may show diluted spatial gradients.
-
-**5. No explicit vulnerability curve tuning**
-- CCART v1.1 uses CLIMADA’s default tropical cyclone vulnerability curves.
-- No India‑specific or sector‑specific vulnerability calibration has been performed.
-- This may affect absolute loss levels before DLNA scaling.
-
-**6. Calibration is event-specific, not cross-event optimized**
-- Each cyclone is calibrated independently to its DLNA total.
-- No multi-event optimization or Bayesian calibration has been applied yet.
-- Ratios may therefore reflect DLNA noise rather than structural model bias.
-
-**7. No uncertainty quantification (yet)**
-- CCART v1.1 provides deterministic outputs.
-- Uncertainty ranges for hazard, exposure, and calibration are not included.
-- Future versions may incorporate ensemble windfields or probabilistic scaling.
-
-**8. Limited to historical cyclone tracks**
-- CCART v1.1 does not include:
-  - synthetic tracks
-  - climate‑change‑adjusted hazard projections
-  - return‑period curves
-- These will be part of the planned multi-hazard expansion.
-
-
-**9. Calibration is state-specific, not multi-state harmonized**
-- DLNA/PDNA reports are issued at the state level, each with its own methodology, sector definitions, and valuation practices.
-- CCART v1.1 calibrates each cyclone within the affected state(s) independently, without harmonizing cross‑state DLNA differences.
-- For cyclones affecting multiple states, calibrated losses reflect state-by-state scaling, not a unified multi-state calibration.
-- This may introduce discontinuities at state borders where DLNA methodologies differ.
+- **Exposure is proxy‑based.** We rely on litpop and other proxies; results depend on proxy quality and spatial resolution.
+- **District‑level calibration.** DLNA values are aggregated and may not capture local variations in impact.
+- **Windfield simplifications.** CLIMADA’s parametric wind model may differ from high‑resolution dynamical simulations.
+- **No flood or storm‑surge module yet.** The current version models wind impacts only.
+- **Historical bias.** Outputs depend on IBTrACS track accuracy and reporting quality.
+- **Not a substitute for engineering studies.** CCART provides indicative risk patterns, not site‑specific structural assessments.
 
 ---
 
@@ -390,36 +335,35 @@ CCART is designed for researchers, analysts, and institutions seeking credible, 
 ## 📂 Data Sources
 
 CCART relies on a combination of open datasets and curated inputs.  
-Large datasets are **not included** in this repository to keep the project lightweight.
+Large datasets are **not bundled** with this repository to keep the project lightweight.
 
 ### 🌪️ Tropical Cyclone Tracks (IBTrACS)
 
 The full IBTrACS dataset can be downloaded from NOAA:  
 https://www.ncei.noaa.gov/products/international-best-track-archive
 
-Place the downloaded file in:
-
-```
-data/IBTRACS.ALL.v04r01.nc
-```
+Place the netcdf file at: 
+`data/IBTRACS.ALL.v04r01.nc`
 
 ### 🗺️ Administrative Boundaries
 
-Odisha district boundaries (GeoJSON) should be placed in:
+CCART requires district‑level administrative boundaries for hazard, exposure, and impact aggregation.
 
-```
-data/ODISHA_DISTRICTS.geojson
-```
+Place the national‑level GeoJSON or shapefile in:
+`data/INDIA_DISTRICTS.geojson`
 
-### 📊 DLNA / PDNA (Fani)
+### 📊 DLNA / PDNA Calibration Inputs
 
-A cleaned version of the DLNA/PDNA file for Cyclone Fani should be placed in:
+DLNA/PDNA totals are required for cyclone‑level calibration.
+These files are not included due to licensing restrictions.
 
-```
-data/fani_impact_short.xlsx
-```
+Place cleaned DLNA/PDNA summaries in:
+`data/dlna/<cyclone>.xlsx`
 
-(Full DLNA datasets are not included due to licensing considerations.)
+For example:
+`data/dlna/fani.xlsx`
+
+`data/dlna/yaas.xlsx`
 
 ### 🗺️ INDIA SHAPEFILES
 
@@ -449,20 +393,16 @@ See `LICENSE` for details.
 
 If you use CCART in research, analysis, or publications, please cite it as:
 ```
-Pednekar, K. (2026). CCART: Cyclone Calibration and Risk Toolkit (India) – 
-Pan‑India 15‑Cyclone Calibrated Release (v1.1).
-https://github.com/<your‑repo‑path>
+Pednekar, K. (2026). CCART: Cyclone Calibration and Risk Toolkit (India) – Pan‑India 15‑Cyclone Calibrated Release (v1.1).
+https://github.com/ketan-pednekar
 ```
 For general reference to the methodology:
 ```
-Pednekar, K. (2026). A transparent, reproducible framework for district‑level 
-tropical cyclone impact modelling in India using CLIMADA, DLNA calibration, 
-and Hazard‑Weighted Exposure (HWE).
+Pednekar, K. (2026). A transparent, reproducible framework for district‑level tropical cyclone impact modelling in India using CLIMADA, DLNA calibration, and Hazard‑Weighted Exposure (HWE).
 ```
 If you use specific datasets from the repository (e.g., district_relationships_master.csv or cyclone_level_summary.csv), please cite:
 ```
-CCART Dataset (2026). District‑level calibrated cyclone impact dataset for 
-15 historical Indian cyclones (2009–2021). Part of CCART v1.1.
+CCART Dataset (2026). District‑level calibrated cyclone impact dataset for 15 historical Indian cyclones (2009–2021). Part of CCART v1.1.
 ```
 ---
 ## 🤝 Contributors & Acknowledgements
@@ -492,12 +432,22 @@ To contribute:
 3. Follow the project’s structure and reproducibility principles  
 
 CCART is built on transparency, collaboration, and scientific clarity — and contributions that uphold these values are especially welcome.
-
 ---
-
 Open an **Issue** or start a **Discussion** to get involved.
-
+---
 ## 🚀 Releases
+
+v1.2 – Metadata‑Driven, Multi‑State Architecture
+
+- Introduced a fully metadata‑driven cyclone workflow (single script, multiple cyclones)
+- Added multi‑state calibration logic for cyclones affecting more than one state
+- Separated state‑agnostic CCART engine from state‑specific configuration
+- Upgraded all cyclone scripts to the new v1.2 architecture
+- Regenerated the full 15‑cyclone national dataset using the new engine
+- Integrated batch runner for end‑to‑end national automation
+- Ensured SID‑anchored consistency across all outputs
+- Refined directory structure for clarity, reproducibility, and future expansion
+
 
 v1.1 – Pan‑India 15‑Cyclone Calibrated Release
 
@@ -508,6 +458,36 @@ v1.1 – Pan‑India 15‑Cyclone Calibrated Release
 - Added **SID‑anchored metadata** for every cyclone
 - Standardized all cyclone workflows for reproducibility and transparency
 - Improved documentation and repository structure for national‑scale analysis
+
+  🌀 Cyclones Included in v1.1
+
+  CCART v1.1 expands the platform from 5 calibrated cyclones to a full
+  15‑cyclone national dataset covering all major Indian landfalls from 2009–2021.
+
+  | Cyclone | Year | DLNA (USD) | State |
+  |--------|------|------------|--------|
+  | Aila | 2009 | 1.2B | West Bengal |
+  | Laila | 2010 | 0.6B | Andhra Pradesh |
+  | Phailin | 2013 | 4.15B | Odisha |
+  | Helen | 2013 | 0.5B | Andhra Pradesh |
+  | Hudhud | 2014 | 3.5B | Andhra Pradesh |
+  | Vardah | 2016 | 1.0B | Tamil Nadu |
+  | Ockhi | 2017 | 0.9B | Kerala |
+  | Titli | 2018 | 0.92B | Odisha |
+  | Gaja | 2018 | 1.6B | Tamil Nadu |
+  | Fani | 2019 | 4.2B | Odisha |
+  | Bulbul | 2019 | 3.2B | West Bengal |
+  | Amphan | 2020 | 13.0B | West Bengal |
+  | Nisarga | 2020 | 0.6B | Maharashtra |
+  | Tauktae | 2021 | 1.0B | Gujarat |
+  | Yaas | 2021 | 2.99B | Odisha |
+
+  **Each cyclone includes:**
+
+  - District‑level calibrated loss table  
+  - Choropleth map  
+  - Narrative summary  
+  - HWE diagnostics  
 
 
 v1.0 – Multi‑cyclone calibrated release
