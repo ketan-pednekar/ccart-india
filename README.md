@@ -537,6 +537,9 @@ Open an **Issue** or start a **Discussion** to get involved.
 - Preserved all **v1.2 legacy scripts** for transparency and reproducibility  
 - Refined repository structure for clarity, modularity, and future multi‑hazard expansion  
 
+**Note on Cyclone Tauktae (2021)**  
+Cyclone Tauktae is excluded from the v1.3 calibrated dataset.
+During processing, CLIMADA’s parametric windfield model reached a computational ceiling under Tauktae’s extreme intensity and multi‑state footprint, resulting in unstable hazard fields. To maintain scientific integrity and reproducibility, Tauktae is deferred to a future release once a stable configuration is established.
 
 ### v1.2 – Metadata‑Driven, Multi‑State Architecture
 
