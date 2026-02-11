@@ -1,22 +1,85 @@
+# -------------------------
 # Python cache
+# -------------------------
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
+# -------------------------
 # Build artifacts
+# -------------------------
 *.egg-info/
+dist/
+build/
 
-# Data (large or sensitive)
+# -------------------------
+# VS Code
+# -------------------------
+.vscode/
+
+# -------------------------
+# Notebook checkpoints
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# Outputs (DO NOT PUSH)
+# -------------------------
+outputs/
+outputs/*
+
+# Synthetic runs
+synthetic_runs/
+synthetic/
+diagnostics/
+
+# Maps and generated visuals
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# -------------------------
+# Large geospatial files
+# -------------------------
+*.tif
+*.tiff
+*.nc
+*.grib
+*.grb
+*.geojson
+*.gpkg
+*.shp
+*.dbf
+*.prj
+*.shx
+*.cpg
+*.qmd
+
+# -------------------------
+# Data folder (large datasets)
+# -------------------------
 data/*.nc
 data/*.tif
 data/*.grib
 data/*.geojson
-*.nc
-*.tif
-*.grib
-*.geojson
+data/*.gpkg
+data/*.shp
+data/*.dbf
+data/*.prj
+data/*.shx
+data/*.cpg
+data/*.zip
+data/*.xlsx
+data/*.csv
 
-# VS Code
-.vscode/
+# Allow small metadata files
+!data/README.md
 
-# Notebook checkpoints
-.ipynb_checkpoints/
+# -------------------------
+# Logs
+# -------------------------
+*.log
+*.tmp
+
