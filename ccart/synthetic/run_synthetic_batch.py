@@ -25,6 +25,9 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
     print(f"Runs per scenario: {n_runs_per_scenario}\n")
 
     for scenario in SCENARIOS:
+        retry_count = 0
+        valid_count = 0
+
         print(f"\n=== Scenario: {scenario} ===")
 
         scenario_dir = os.path.join(batch_root, scenario)
@@ -40,11 +43,21 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
             print(f"\n→ Scenario {scenario} | Run {i}/{n_runs_per_scenario}")
 
             # Inject scenario into the environment
-            result = run_single_synthetic(run_dir)
+            result = run_single_synthetic(
+                run_dir,
+                save_hazard=True,
+                save_track=True,
+                save_hazard_gpkg=True,
+                save_track_csv=True
+            )
 
             if result == "RETRY":
-                print("⚠️  Zero-impact storm — regenerating this run.")
+                retry_count += 1
+                print(f"⚠️ RETRY #{retry_count} for scenario '{scenario}' (attempt {i})")
                 continue
+
+            valid_count += 1
+            print(f"✓ Valid storm #{valid_count} for scenario '{scenario}'")
 
             result["run_id"] = run_id
             result["scenario"] = scenario
@@ -52,6 +65,11 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
 
             scenario_rows.append(result)
             master_rows.append(result)
+
+        print(f"\n=== Scenario '{scenario}' summary ===")
+        print(f"  Valid storms : {valid_count}")
+        print(f"  RETRY storms : {retry_count}")
+        print("=====================================\n")
 
         # Save scenario summary
         scenario_csv = os.path.join(scenario_dir, "scenario_summary.csv")

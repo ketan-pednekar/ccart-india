@@ -54,7 +54,14 @@ def _normalize_name(s):
     )
 
 
-def main(run_dir_override=None):
+def main(
+    run_dir_override=None,
+    save_hazard=False,
+    save_track=False,
+    save_hazard_gpkg=False,
+    save_track_csv=False
+):
+
     """
     Main synthetic cyclone driver.
 
@@ -123,7 +130,6 @@ def main(run_dir_override=None):
         print(syn_track.data_vars)
         print("-------------------------------")
 
-
         # Quick wind check
         peak_kn = float(syn_track["max_sustained_wind"].max())
         print("  Peak wind (kn):", peak_kn)
@@ -146,7 +152,19 @@ def main(run_dir_override=None):
 
         print("  ✅ Storm accepted.")
         hazard = hazard_tmp
-        break
+
+        # ------------------------------------------------------------
+        # SAVE TRACK CSV (if requested)
+        # ------------------------------------------------------------
+        if save_track_csv and run_dir_override is not None:
+            df_track = syn_track.to_dataframe()
+            df_track.to_csv(
+                os.path.join(run_dir_override, "track.csv"),
+                index=False
+            )
+            print(f"   → Saved track.csv to {run_dir_override}")
+
+        break  # IMPORTANT: break AFTER saving track
 
     else:
         raise RuntimeError("Failed to generate a damaging synthetic cyclone after multiple attempts.")
@@ -211,6 +229,25 @@ def main(run_dir_override=None):
     print("   Events   :", hazard.event_id.size)
     print("   Centroids:", hazard.centroids.size)
     print("   Max intensity:", float(hazard.intensity.max()))
+
+    if save_hazard_gpkg and run_dir_override is not None:
+        
+        df = pd.DataFrame({
+            "lat": hazard.centroids.lat,
+            "lon": hazard.centroids.lon,
+            "intensity": hazard.intensity.toarray().ravel()
+        })
+
+        gdf = gpd.GeoDataFrame(
+            df,
+            geometry=gpd.points_from_xy(df.lon, df.lat),
+            crs="EPSG:4326"
+        )
+
+        out_path = os.path.join(run_dir_override, "hazard.gpkg")
+        gdf.to_file(out_path, driver="GPKG")
+        print(f"   → Saved hazard.gpkg to {out_path}")
+
 
     # ------------------------------------------------------------
     # 6. Clip exposure to hazard bounding box
@@ -618,7 +655,14 @@ def main(run_dir_override=None):
     return merged, state_loss, metadata
 
 
-def run_single_synthetic(run_dir):
+def run_single_synthetic(
+    run_dir,
+    save_hazard=False,
+    save_track=False,
+    save_hazard_gpkg=False,
+    save_track_csv=False
+):
+
     """
     Wrapper that runs ONE synthetic cyclone and returns summary metrics.
     Saves maps + GPKG inside run_dir using the structure:
@@ -631,7 +675,14 @@ def run_single_synthetic(run_dir):
                 state/
     """
 
-    result = main(run_dir_override=run_dir)
+    result = main(
+        run_dir_override=run_dir,
+        save_hazard=save_hazard,
+        save_track=save_track,
+        save_hazard_gpkg=save_hazard_gpkg,
+        save_track_csv=save_track_csv
+    )
+
 
     # If main() signals a retry, run again
     if result == "RETRY":

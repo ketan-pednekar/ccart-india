@@ -130,8 +130,7 @@ def build_hazard_from_tc_tracks(
     haz.check()
 
     print("\n=== DEBUG: Hazard centroid spacing ===")
-    print("Mean lat spacing:", np.mean(np.diff(np.unique(hazard.centroids.lat))))
-    print("Mean lon spacing:", np.mean(np.diff(np.unique(hazard.centroids.lon))))
-
+    print("Mean lat spacing:", np.mean(np.diff(np.unique(haz.centroids.lat))))
+    print("Mean lon spacing:", np.mean(np.diff(np.unique(haz.centroids.lon))))
 
     return haz
