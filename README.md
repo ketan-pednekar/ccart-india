@@ -13,68 +13,161 @@
 
 ## **CCART v2 — Synthetic Cyclone Impact Engine (2026)**
 
-A clean, modular, reproducible engine for generating synthetic tropical cyclone impacts across India. It integrates **CLIMADA’s open‑source hazard engine** with **DLNA‑aligned calibration** to generate consistent, physics‑based loss estimates across all Indian districts. 
+A clean, modular, and fully reproducible engine for generating synthetic tropical cyclone impacts across India.
 
-**CCART v2** introduces a fully automated synthetic cyclone generator that produces realistic, physics‑consistent cyclone impacts beyond the historical record. It extends CCART from a calibrated historical toolkit (v1.3) into a **probabilistic, scenario‑driven climate‑risk platform**.
+CCART integrates **CLIMADA’s open‑source hazard engine, DLNA‑aligned calibration,** and a **physics‑consistent synthetic track generator** to produce district‑level cyclone risk intelligence that is transparent, extensible, and ready for national‑scale analysis.
+
+**CCART v2** marks a major evolution of the platform — from a calibrated historical toolkit (v1.x) to a probabilistic, scenario‑driven synthetic cyclone engine.
+It introduces a complete end‑to‑end workflow that generates realistic cyclone tracks, builds hazard footprints, computes calibrated losses, and exports district‑level maps and metadata for every synthetic event.
+
+This release is designed for researchers, analysts, and institutions seeking **credible, open, and reproducible climate‑risk diagnostics** for India, and for anyone who believes that transparent modelling is essential for adaptation planning.
 
 ## 🌟 What’s New in v2
-- Synthetic cyclone generator (historical analogue clustering)
-- v2 hazard engine with improved footprint realism
-- Inland masking using distance‑to‑coast
-- Exposure–hazard clipping for computational efficiency
-- District‑level hazard statistics (max wind, inland flag, coastal proximity)
-- Calibration applied only to coastal districts
-- Hazard‑Weighted Exposure (HWE) for spatial allocation
-- District + state maps for every affected region
-- Batch runner for generating synthetic catalogues
-- Clean per‑run folder structure and metadata
-- Catalogue‑ready outputs for probabilistic risk analysis
+CCART v2 is a major leap forward — transforming the toolkit from a calibrated historical engine into a **probabilistic, scenario‑driven synthetic cyclone platform**.
+This release introduces a clean, modular, and fully automated workflow that generates realistic cyclone tracks, builds hazard footprints, computes calibrated losses, and exports district‑level maps for every synthetic event.
+
+**🔹 1. Synthetic Cyclone Generator (v2)**
+A redesigned generator that produces physics‑consistent synthetic tracks using:
+- historical analogue clustering
+- track‑shape perturbations
+- curvature adjustments
+- translation‑speed variety (new)
+- intensity peak/decay/timing perturbations
+This creates a diverse, realistic catalogue of storms beyond the historical record.
+
+**🔹 2. Translation‑Speed Variety (New in v2)**
+A key realism lever added in v2:
+- slower storms → more rainfall + coastal concentration
+- faster storms → deeper inland penetration
+- more diverse hazard footprints
+This significantly improves the physical behaviour of synthetic tracks.
+
+**🔹 3. Improved Hazard Engine (v2)**
+A refined CLIMADA‑based hazard wrapper with:
+- better inland decay
+- bounding‑box hazard clipping
+- district‑level hazard statistics
+- peak wind diagnostics
+- inland/coastal classification
+The hazard footprint is now more stable, efficient, and physically interpretable.
+
+**🔹 4. Exposure–Hazard Clipping**
+A major performance improvement:
+- only exposure points inside the hazard footprint are processed
+- reduces computation by 80–90%
+- preserves spatial accuracy
+This makes large synthetic catalogues feasible.
+
+**🔹 5. DLNA‑Aligned Calibration (Coastal‑Only)**
+Calibration is now applied only to coastal districts, ensuring:
+- scientific consistency
+- stable national‑scale loss estimates
+- realistic inland decay patterns
+This avoids over‑calibration in inland regions.
+
+**🔹 6. Hazard‑Weighted Exposure (HWE)**
+A refined spatial allocation method that:
+- preserves hazard gradients
+- distributes calibrated losses proportionally
+- produces interpretable district‑level patterns
+HWE is now the default allocation engine for all synthetic events.
+
+**🔹 7. Clean, Reproducible Output Structure**
+Each synthetic run now includes:
+- `impact.gpkg`
+- `metadata.json`
+- district‑level maps
+- state‑level summaries
+- hazard diagnostics
+This structure is designed for catalogue‑level analysis and long‑term archival.
+
+**🔹 8. Batch Catalogue Generation**
+A fully automated batch runner that:
+- generates 10, 50, 100, or 1000 synthetic storms
+- appends results to synthetic_summary.csv
+- supports return‑period curves and hotspot analysis
+This is the foundation for national‑scale probabilistic risk layers.
+
+**🔹 9. Fully Transparent, Fully Open**
+Every step — hazard, exposure, impact, calibration, HWE — is:
+- deterministic
+- reproducible
+- inspectable
+- open‑source
+No black‑box components.
+No hidden assumptions.
+
 ---
 
 ## Key Features (v2)
+A clean, modular, and fully reproducible cyclone‑impact engine designed for India’s district‑level risk landscape.
+CCART v2 brings together hazard science, geospatial analysis, and transparent calibration into a single, deterministic workflow.
 
-### 🔹 Synthetic Cyclone Generator
-- Generates realistic, physics‑consistent synthetic cyclone tracks  
-- Based on historical analogue clustering and intensity distributions  
-- Enables probabilistic and scenario‑driven risk analysis  
-
-### 🔹 v2 Hazard Engine
-- Improved windfield realism and inland decay  
-- Bounding‑box hazard clipping for computational efficiency  
-- District‑level hazard statistics (max wind, inland flag, coastal proximity)  
-
-### 🔹 DLNA‑Aligned Calibration (Coastal‑Only)
-- Calibration applied only to coastal districts for scientific consistency  
-- Ensures calibrated losses remain physically meaningful  
-- Produces stable, reproducible national‑scale loss estimates  
-
-### 🔹 Hazard‑Weighted Exposure (HWE)
-- Allocates calibrated losses using hazard‑weighted exposure  
-- Preserves spatial gradients from the hazard footprint  
-- Ensures district‑level loss patterns remain physically interpretable  
-
-### 🔹 Clean, Modular Output Structure
-Each synthetic run produces a reproducible folder containing:
-
-- `impact.gpkg`  
-- `metadata.json`  
-- District‑level maps  
-- State‑level maps  
-
-This structure is designed for catalogue‑level analysis and long‑term archival.
-
-### 🔹 Batch Catalogue Generation
-- Run 10, 50, 100, or 1000 synthetic cyclones  
-- Automatically generates `synthetic_summary.csv`  
-- Enables return‑period curves, exceedance probability curves, and atlas‑level diagnostics  
-
-### 🔹 Fully Reproducible, Fully Transparent
-- Deterministic hazard → exposure → impact → calibration → HWE pipeline  
-- No black‑box components  
-- Built entirely on open‑source tools (CLIMADA, GeoPandas, NumPy, Pandas)  
 ---
+**🔹 Synthetic Cyclone Generator**
+A physics‑consistent generator that produces realistic synthetic tracks using:
+- historical analogue clustering
+- track‑shape perturbations
+- curvature adjustments
+- translation‑speed variety (new)
+- intensity peak/decay/timing perturbations
+This creates a diverse catalogue of storms that extend beyond the historical record while remaining grounded in real cyclone behaviour.
 
+---
+**🔹 v2 Hazard Engine (Windfield + Inland Decay)**
+A refined CLIMADA‑based hazard wrapper with:
+- improved inland decay
+- bounding‑box hazard clipping for efficiency
+- district‑level hazard statistics (max wind, inland flag, coastal proximity)
+- peak wind diagnostics for every synthetic event
+The hazard footprint is now more stable, efficient, and physically interpretable.
+
+---
+**🔹 Exposure–Hazard Clipping**
+A major performance improvement:
+- only exposure points inside the hazard footprint are processed
+- reduces computation by 80–90%
+- preserves spatial accuracy
+This makes large synthetic catalogues (100–1000 storms) computationally feasible.
+
+---
+**🔹 DLNA‑Aligned Calibration (Coastal‑Only)**
+Calibration is applied only to coastal districts, ensuring:
+- scientific consistency
+- realistic inland decay
+- stable national‑scale loss estimates
+This avoids over‑calibration in inland regions and keeps the model physically meaningful.
+
+---
+**🔹 Hazard‑Weighted Exposure (HWE)**
+A refined spatial allocation method that:
+- preserves hazard gradients
+- distributes calibrated losses proportionally
+- produces interpretable district‑level patterns
+HWE is now the default allocation engine for all synthetic events.
+
+---
+**🔹 Batch Catalogue Generation**
+A fully automated batch runner that:
+- generates 10, 50, 100, or 1000 synthetic storms
+- appends results to `synthetic_summary.csv`
+- supports return‑period curves, exceedance probability curves, and hotspot analysis
+This is the foundation for national‑scale probabilistic risk layers.
+
+---
+**🔹 Fully Transparent, Fully Open**
+Every step — hazard, exposure, impact, calibration, HWE — is:
+- deterministic
+- reproducible
+- inspectable
+- open‑source
+No black‑box components.
+No hidden assumptions.
+No proprietary dependencies.
+
+---
 **The goal is to build a national, open, reproducible cyclone‑impact platform that researchers, engineers, and policymakers can extend collaboratively.**
+
 ---
 
 ## 📘 Overview (v2)
@@ -83,15 +176,16 @@ CCART v2 introduces a fully automated **synthetic cyclone impact engine** that e
 
 The v2 engine includes:
 
-- **Synthetic cyclone generation** using historical analogue clustering  
-- **v2 hazard engine** with improved footprint realism and inland decay  
-- **Exposure–hazard clipping** for computational efficiency  
-- **District‑level hazard diagnostics** (max wind, inland flag, coastal proximity)  
-- **DLNA‑aligned calibration** applied only to coastal districts  
-- **Hazard‑Weighted Exposure (HWE)** for spatial allocation  
-- **District‑level and state‑level maps** for every affected region  
-- **Per‑run metadata** for catalogue‑level analysis  
-- **Batch runner** for generating synthetic storm catalogues  
+- **Synthetic cyclone generation** using historical analogue clustering
+- **Track‑shape perturbations** (curvature, translation‑speed variety, intensity shifts)
+- **v2 hazard engine** with improved footprint realism and inland decay
+- **Exposure–hazard clipping** for computational efficiency
+- **District‑level hazard diagnostics** (max wind, inland flag, coastal proximity)
+- **DLNA‑aligned calibration** applied only to coastal districts
+- **Hazard‑Weighted Exposure (HWE)** for spatial allocation
+- **District‑level and state‑level maps** for every affected region
+- **Per‑run metadata** for catalogue‑level analysis
+- **Batch runner** for generating synthetic storm catalogues
 
 The v2 engine is designed to be:
 
@@ -106,53 +200,77 @@ The v2 engine is designed to be:
 ```text
 ccart-india/
 │
-├── ccart/                               # CCART v2 engine (active)
+├── ccart/                                   # CCART v2 engine (active)
 │   │
-│   ├── synthetic/                       # Synthetic cyclone generation (v2)
-│   │   ├── run_synthetic_cyclone_v2.py  # Run one synthetic cyclone
-│   │   ├── run_synthetic_batch.py       # Generate full synthetic catalogue
-│   │   ├── generator.py                 # Track generator + analog logic
+│   ├── synthetic/                           # Synthetic cyclone generation (v2)
+│   │   ├── run_synthetic_cyclone_v2.py      # Run one synthetic cyclone
+│   │   ├── run_synthetic_batch.py           # Generate full synthetic catalogue
+│   │   ├── generator.py                     # Track generator + analogue logic
 │   │   └── __init__.py
 │   │
-│   ├── viz/                             # Mapping + visualisation
-│   │   ├── viz_v2.py                    # District/state choropleths
+│   ├── viz/                                 # Mapping + visualisation
+│   │   ├── viz_v2.py                        # District/state choropleths
 │   │   └── __init__.py
 │   │
-│   ├── hazard.py                        # Hazard engine (windfield + decay)
-│   ├── hazard_simulated_v2.py           # CLIMADA-based hazard wrapper
-│   ├── exposure.py                      # LitPop + exposure utilities
-│   ├── vulnerability.py                 # Vulnerability functions
-│   ├── impact.py                        # Impact computation
-│   ├── hwe.py                           # Hazard-Weighted Exposure engine
-│   ├── calibration.py                   # DLNA coastal calibration
+│   ├── hazard.py                            # Hazard engine (windfield + decay)
+│   ├── hazard_simulated_v2.py               # CLIMADA-based hazard wrapper
+│   ├── exposure.py                          # LitPop + exposure utilities
+│   ├── vulnerability.py                     # Vulnerability functions
+│   ├── impact.py                            # Impact computation
+│   ├── hwe.py                               # Hazard-Weighted Exposure engine
+│   ├── calibration.py                       # DLNA coastal calibration
 │   ├── __init__.py
 │
-├── legacy/                              # CCART v1.3 historical engine
+├── legacy/                                  # CCART v1.3 historical engine
 │   ├── pipeline_v1_3.py
 │   ├── utils.py
 │   ├── viz.py
 │   └── ...
 │
-├── archive/                             # Old scripts, prototypes, v1.2 code
+├── archive/                                 # Old scripts, prototypes, v1.2 code
 │   └── ...
 │
-├── scripts/                             # Helper scripts (optional)
+├── scripts/                                 # Helper scripts (optional)
 │   └── ...
 │
-├── data/                                # Required datasets (not bundled)
+├── data/                                    # Required datasets (not bundled)
 │   ├── IBTrACS.ALL.v04r01.nc
 │   ├── india_districts.geojson
 │   ├── coastal_ind.shp
 │   └── ...
 │
-├── outputs/                             # Auto-generated outputs
-│   ├── synthetic/                       # v2 synthetic catalogue
-│   └── diagnostics/                     # Plots, logs, maps
+├── outputs/                                 # Auto-generated outputs
+│   │
+│   ├── v1.2/                                # Historical calibrated outputs (v1.2)
+│   │   └── ...
+│   │
+│   ├── v1.3/                                # Historical calibrated outputs (v1.3)
+│   │   └── ...
+│   │
+│   ├── synthetic_runs_multi/                # v2 synthetic catalogue (multi-scenario)
+│   │   ├── master_summary.csv               # Combined summary for all runs
+│   │   │
+│   │   ├── baseline/                        # Baseline synthetic runs
+│   │   │   ├── run_001/
+│   │   │   ├── run_002/
+│   │   │   └── ...
+│   │   │
+│   │   ├── warm_sst/                        # Warm SST scenario runs
+│   │   │   ├── run_001/
+│   │   │   ├── run_002/
+│   │   │   └── ...
+│   │   │
+│   │   ├── high_end/                        # High-end climate scenario runs
+│   │   │   ├── run_001/
+│   │   │   ├── run_002/
+│   │   │   └── ...
+│   │
+│   └── diagnostics/                         # Plots, logs, maps
 │
-├── docs/                                # Documentation + methodology
-├── examples/                            # Example workflows
-├── notebooks/                           # Jupyter notebooks
-├── analysis/                            # Additional analysis scripts
+├── docs/                                    # Documentation + methodology
+├── examples/                                # Example workflows
+├── notebooks/                               # Jupyter notebooks
+├── analysis/                                # Additional analysis scripts
 │
 ├── README.md
 ├── LICENSE
@@ -188,56 +306,93 @@ python synthetic/run_synthetic_batch.py
 ### This will automatically generate:
 
 ```bash
-outputs/synthetic_runs/
-    run_001/
-    run_002/
-    ...
-    synthetic_summary.csv
+outputs/synthetic_runs_multi/
+    master_summary.csv
+
+    baseline/
+        run_001/
+        run_002/
+        ...
+
+    warm_sst/
+        run_001/
+        run_002/
+        ...
+
+    high_end/
+        run_001/
+        run_002/
+        ...
 ```
+Each run folder contains:
+- `impact.gpkg`
+- district‑level and state‑level losses
+- hazard footprint
+- calibration + HWE outputs
+- metadata JSON
+- maps
+The `master_summary.csv` file aggregates all runs across all scenarios for catalogue‑level analysis.
+
 ---
 ## 🧭 CCART V2 Pipeline
 
 ```
-┌──────────────────────────┐
-│  Synthetic Track Engine  │
-│ (Analogue-based generator)│
-└───────────────┬──────────┘
-                │
-                ▼
-┌──────────────────────────┐
-│     Hazard Engine v2     │
-│ (Windfield + inland decay)│
-└───────────────┬──────────┘
-                │
-                ▼
-┌──────────────────────────┐
-│   Exposure–Hazard Clip   │
-│ (District geometry mask) │
-└───────────────┬──────────┘
-                │
-                ▼
-┌──────────────────────────┐
-│      Impact Module       │
-│   (Raw CLIMADA losses)   │
-└───────────────┬──────────┘
-                │
-                ▼
-┌──────────────────────────┐
-│   Calibration (Coastal)  │
-│  DLNA-aligned scaling    │
-└───────────────┬──────────┘
-                │
-                ▼
-┌──────────────────────────┐
-│ Hazard-Weighted Exposure │
-│   (Spatial allocation)   │
-└───────────────┬──────────┘
-                │
-                ▼
-┌──────────────────────────┐
-│     Final Outputs        │
-│ Maps • GPKG • Metadata   │
-└──────────────────────────┘
+┌──────────────────────────────────────────┐
+│      Synthetic Track Engine (v2)         │
+│  • Analogue selection                    │
+│  • Track-shape perturbations             │
+│  • Curvature adjustments                 │
+│  • Translation-speed variety (new)       │
+│  • Intensity peak/decay/timing shifts    │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│            Hazard Engine v2              │
+│   • CLIMADA windfield                    │
+│   • Improved inland decay                │
+│   • Bounding-box hazard clipping         │
+│   • District-level hazard stats          │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│        Exposure–Hazard Clipping          │
+│   • District geometry mask               │
+│   • Efficient exposure filtering         │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│              Impact Module               │
+│        • Raw CLIMADA losses              │
+│        • Hazard diagnostics              │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│      DLNA-Aligned Calibration (Coastal)  │
+│   • Coastal-only scaling                 │
+│   • Preserves inland decay               │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│        Hazard-Weighted Exposure (HWE)    │
+│   • Spatial allocation of calibrated loss│
+│   • Preserves hazard gradients           │
+└───────────────────────┬──────────────────┘
+                        │
+                        ▼
+┌──────────────────────────────────────────┐
+│              Final Outputs               │
+│   • District-level GPKG                  │
+│   • State summaries                      │
+│   • Maps (PNG)                           │
+│   • Metadata (JSON)                      │
+│   • Batch catalogue (CSV)                │
+└──────────────────────────────────────────┘
+
 ```
 ---
 ## **Usage (v2)**
@@ -245,18 +400,22 @@ outputs/synthetic_runs/
 CCART v2 is built around a clean, modular workflow.
 All synthetic cyclone analyses are executed through the `ccart/synthetic/` scripts:
 
-- hazard generation (v2)
+The v2 engine automatically handles:
+- synthetic track generation
+- hazard footprint creation
 - exposure–hazard clipping
 - raw impact computation
 - coastal‑only DLNA calibration
-- HWE spatial allocation
-- district‑level and state‑level maps
-- metadata export
-- batch catalogue generation  
+- Hazard‑Weighted Exposure (HWE) allocation
+- district‑level and state‑level map export
+- metadata logging
+- multi‑scenario catalogue generation
+
 ---
 
 ### **What the v2 scripts do**
 - Generate a synthetic cyclone track
+- Apply track‑shape perturbations (curvature, translation speed, intensity variety)
 - Build the v2 hazard footprint
 - Clip hazard to district geometry
 - Compute raw CLIMADA losses
@@ -264,36 +423,47 @@ All synthetic cyclone analyses are executed through the `ccart/synthetic/` scrip
 - Allocate calibrated losses using HWE
 - Export maps and impact tables
 - Write run‑level metadata
-- Append results to `synthetic_summary.csv` (batch mode)
+- Append results to master_summary.csv (multi‑scenario batch mode)
 ---
 
 ### Where to explore the workflow
 
-The full v2 pipeline scripts are located in:
-`ccart`
-`ccart/synthetic/`
-
-Key components include:
-
-`run_synthetic_cyclone_v2.py` — run a single synthetic cyclone
-`run_synthetic_batch.py` — generate a synthetic catalogue
-`hazard_v2.py` — hazard engine
-`calibration_v2.py` — coastal calibration
-`hwe_v2.py` — spatial allocation
-`viz_v2.py` — map generation
-These scripts demonstrate how to run a cyclone, inspect outputs, and explore intermediate diagnostics.
+```
+ccart/
+    synthetic/      # Track generation + batch runner
+    hazard.py       # Hazard engine (windfield + inland decay)
+    exposure.py     # Exposure extraction + clipping
+    impact.py       # Raw CLIMADA impact
+    calibration.py  # DLNA coastal calibration
+    hwe.py          # Hazard-Weighted Exposure
+    viz/            # District/state maps
+```
+These scripts demonstrate how to:
+- generate synthetic tracks
+- build hazard footprints
+- compute raw and calibrated losses
+- allocate losses spatially
+- export maps and metadata
+- generate multi‑scenario catalogues
 
 ---
 
 ## ⚠️ Known Limitations
 
-- **Exposure is proxy‑based.** We rely on litpop and other proxies; results depend on proxy quality and spatial resolution.
-- **District‑level calibration.** DLNA values are aggregated and may not capture local variations in impact.
-- **Windfield simplifications.** CLIMADA’s parametric wind model may differ from high‑resolution dynamical simulations.
-- **No flood or storm‑surge module yet.** The current version models wind impacts only.
-- **Historical bias.** Outputs depend on IBTrACS track accuracy and reporting quality.
-- **Not a substitute for engineering studies.** CCART provides indicative risk patterns, not site‑specific structural assessments.
-- **Synthetic tracks are analogue‑based.** They follow historical geometry patterns and do not yet include perturbations or Monte‑Carlo variations (planned for v2.1).
+- **Exposure is proxy‑based.** 
+  We rely on litpop and other proxies; results depend on proxy quality and spatial resolution.
+- **District‑level calibration.** 
+  DLNA values are aggregated and may not capture local variations in impact.
+- **Windfield simplifications.** 
+  CLIMADA’s wind model is robust but may differ from high‑resolution dynamical simulations, especially for extreme events.
+- **Wind‑only impact modelling.**
+  v2 currently models wind impacts only. Flood, rainfall, and storm‑surge modules are planned for future releases.
+- **Historical bias in analogue selection.**  
+  Synthetic tracks depend on IBTrACS track accuracy and reporting quality; historical biases can influence analogue clusters.
+- **Not a substitute for engineering studies.**
+  CCART provides indicative district‑level risk patterns, not site‑specific structural assessments.
+- **Synthetic tracks follow historical geometry envelopes.**
+  v2 includes perturbations (curvature, translation speed, intensity variety), but full Monte‑Carlo geometry expansion is planned for v2.1.
 
 ---
 
@@ -306,25 +476,24 @@ This toolkit provides:
 
 - **Transparent, calibrated cyclone loss estimates** at the district level
 - **Reproducible, open workflows** built entirely on public data and open‑source tools
-- **A modular pipeline** covering hazard, exposure, impact, and calibration
+- **A modular pipeline** covering hazard, exposure, impact, calibration, and spatial allocation
+- **Scenario‑driven synthetic catalogues** for probabilistic risk analysis
 - **A foundation for future expansion** into multi‑hazard and future‑climate scenarios
 
-CCART is designed for researchers, analysts, and institutions seeking **credible, scalable, and fully transparent climate‑risk diagnostics for India.**
+CCART is designed for researchers, analysts, and institutions seeking **credible, scalable, and fully transparent climate‑risk diagnostics for India-** a platform that can evolve into a national public good.
 
 ---
 ## 🧭 Roadmap
 
 ### v2.0 — Synthetic Cyclone Expansion (Current Release)
 - analogue‑based synthetic track generation
+- track‑shape perturbations (curvature, translation speed, intensity variety)
 - calibrated wind‑impact modelling across all coastal states
 - district‑level hazard, exposure, impact, and HWE allocation
-- reproducible synthetic catalogue for probabilistic risk layers
+- multi‑scenario synthetic catalogues (baseline, warm SST, high‑end)
+- reproducible outputs for probabilistic risk layers
 
-### v2.1 — Enhanced Synthetic Engine
-- perturbation‑based track variations (Monte‑Carlo geometry)
-- improved inland decay and exposure masking
-- expanded diagnostics and metadata for each synthetic run
-
+---
 ### v3.0 — High‑Resolution & ML‑Driven Cyclone Risk
 *(Refining cyclone impacts before expanding into multi‑hazard)*
 - high‑resolution proxy layers (nightlights, land use, infrastructure density)
@@ -332,11 +501,13 @@ CCART is designed for researchers, analysts, and institutions seeking **credible
 - QGIS‑ready outputs for TCFD, site‑level screening, and infrastructure planning
 - refined cyclone‑only risk layers for adaptation and insurance use‑cases
 
+---
 ### v4.0 — Multi‑Hazard Expansion (Post‑Cyclone Consolidation)
 - Flood module (rainfall + riverine + surge integration)
 - Heat module (tasmax anomalies + population‑weighted exposure)
 - unified multi‑hazard impact layers for adaptation planning
 - long‑term climate scenario integration (CMIP6/7)
+
 ---
 
 ## 📂 Data Sources
@@ -440,19 +611,26 @@ Open an **Issue** or start a **Discussion** to get involved.
 ## 🚀 Releases
 
 ### v2.0 – Synthetic Cyclone Engine (Current Release)
-- Introduces **synthetic cyclone generation** using analogue‑based track geometry
-- Adds the full **v2 hazard engine** with improved inland decay and spatial consistency
-- Implements **district‑level hazard, exposure, impact, and HWE allocation** for synthetic events
-- Adds **run‑level metadata**, diagnostics, and reproducible outputs for every synthetic cyclone
-- Supports **batch catalogue generation** for probabilistic risk analysis
-- Provides **clean v2 scripts** (`run_synthetic_cyclone_v2.py`, `run_synthetic_batch.py`, `hazard_v2.py`, `calibration_v2.py`, `hwe_v2.py`, `viz_v2.py`)
-- Establishes a **modular, transparent v2 workflow** for national‑scale synthetic risk modelling
+- Introduces a physics‑consistent synthetic cyclone generator with analogue clustering, curvature perturbations, translation‑speed variety, and intensity variation.
+- Adds the full v2 hazard engine with improved inland decay, bounding‑box clipping, and district‑level hazard diagnostics.
+- Implements district‑level hazard, exposure, impact, calibration, and HWE allocation for every synthetic event.
+- Supports multi‑scenario synthetic catalogues (baseline, warm SST, high‑end) for probabilistic and climate‑conditioned risk analysis.
+- Adds run‑level metadata, diagnostics, maps, and reproducible outputs for each synthetic cyclone.
+- Provides clean v2 scripts:
+  `run_synthetic_cyclone_v2.py`
+  `run_synthetic_batch.py`
+  `generator.py`
+  `hazard.py`
+  `calibration.py`
+  `hwe.py`
+  `viz_v2.py`
+- Establishes a modular, transparent v2 workflow for national‑scale synthetic risk modelling.
 
 Note:  
-v2 focuses on **synthetic cyclone modelling**. Historical DLNA‑calibrated datasets remain available under v1.x for transparency and reproducibility.
+v2 focuses on **synthetic cyclone modelling**.
+Historical DLNA‑calibrated datasets remain available under **v1.2** and **v1.3** for transparency, reproducibility, and comparison.
 
-
-
+---
 ### v1.3 – Automated, Metadata‑Driven Multi‑Cyclone Engine
 
 - Introduced the **v1.3 multi‑state engine** (`pipeline_v1_3.py`) with metadata‑driven execution  
@@ -468,6 +646,7 @@ v2 focuses on **synthetic cyclone modelling**. Historical DLNA‑calibrated data
 Cyclone Tauktae is excluded from the v1.3 calibrated dataset.
 During processing, CLIMADA’s parametric windfield model reached a computational ceiling under Tauktae’s extreme intensity and multi‑state footprint, resulting in unstable hazard fields. To maintain scientific integrity and reproducibility, Tauktae is deferred to a future release once a stable configuration is established.
 
+---
 ### v1.2 – Metadata‑Driven, Multi‑State Architecture
 
 - Introduced a fully metadata‑driven cyclone workflow (single script, multiple cyclones)  
@@ -479,7 +658,7 @@ During processing, CLIMADA’s parametric windfield model reached a computationa
 - Ensured SID‑anchored consistency across all outputs  
 - Refined directory structure for clarity, reproducibility, and future expansion  
 
-
+---
 ### v1.1 – Pan‑India 15‑Cyclone Calibrated Release
 
 - Added **15 calibrated historical cyclones** (2009–2021)  
@@ -517,7 +696,7 @@ During processing, CLIMADA’s parametric windfield model reached a computationa
 - Narrative summary  
 - HWE diagnostics  
 
-
+---
 ### v1.0 – Multi‑Cyclone Calibrated Release
 
 - Added Amphan, Fani, Nisarga, Phailin, and Tauktae  
@@ -528,9 +707,11 @@ During processing, CLIMADA’s parametric windfield model reached a computationa
 - Published CCART v1.0 slide carousel  
 - Repository restructured for clarity and reproducibility  
 
-
+---
 ### v0.9 – Fani Baseline
 
 - Initial prototype of CCART  
 - First implementation of hazard ingestion, exposure, and vulnerability  
 - Early calibration workflow       
+
+---

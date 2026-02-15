@@ -48,25 +48,7 @@ def load_districts(path: str,
 def load_litpop_for_state(country_code: str,
                           districts: gpd.GeoDataFrame,
                           cached_litpop=None):
-    """
-    Load LitPop for a country and subset to the given state's districts.
 
-    Parameters
-    ----------
-    country_code : str
-        ISO country code (e.g., "IND").
-    districts : GeoDataFrame
-        District polygons for the state.
-    cached_litpop : GeoDataFrame or None
-        Optional cached India-wide LitPop to avoid repeated API calls.
-
-    Returns
-    -------
-    assets_state : GeoDataFrame
-        LitPop exposure points within the state.
-    district_exp : DataFrame
-        District-level exposure totals.
-    """
     if cached_litpop is None:
         client = Client()
         assets = client.get_litpop(country=country_code)
@@ -87,6 +69,9 @@ def load_litpop_for_state(country_code: str,
         predicate="within"
     )
 
+    # ⭐ CRITICAL FIX: assign impact function ID to exposure points
+    assets_state["impf_TC"] = 1
+
     district_exp = (
         assets_state.groupby("District")["value"]
         .sum()
@@ -95,6 +80,7 @@ def load_litpop_for_state(country_code: str,
     )
 
     return assets_state, district_exp
+
 
 
 def compute_district_exposure(assets_state: pd.DataFrame,

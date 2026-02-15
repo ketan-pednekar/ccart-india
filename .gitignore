@@ -31,8 +31,9 @@ outputs/*
 
 # Synthetic runs
 synthetic_runs/
-synthetic/
+synthetic_runs_multi/
 diagnostics/
+
 
 # Maps and generated visuals
 *.png
