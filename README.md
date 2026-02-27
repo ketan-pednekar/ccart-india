@@ -1,14 +1,65 @@
-# CCART: Cyclone Calibration and Risk Toolkit (India)
+# CCART v3 — Public Modular Release (Cyclone + OSM Vizag)
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Python-3.10%2B-blue" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow" />
-  <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Release-v2.0-brightgreen" />
-  <img src="https://img.shields.io/github/last-commit/ketan-pednekar/ccart-india" />
-  <img src="https://img.shields.io/github/issues/ketan-pednekar/ccart-india" />
-  <img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" />
+<img src="https://img.shields.io/badge/Python-3.10%2B-blue" />
+<img src="https://img.shields.io/badge/License-MIT-yellow" />
+<img src="https://img.shields.io/badge/Status-Active-brightgreen" />
+<img src="https://img.shields.io/badge/Release-v3.0-brightgreen" />
+<img src="https://img.shields.io/github/last-commit/ketan-pednekar/ccart-india" />
+<img src="https://img.shields.io/github/issues/ketan-pednekar/ccart-india" />
+<img src="https://img.shields.io/github/stars/ketan-pednekar/ccart-india?style=social" />
 </p>
+
+---
+
+## Overview (v3)
+
+CCART v3 introduces a clean, modular, and fully open repository structure designed for transparency, collaboration, and future multi‑hazard expansion. This release focuses on architecture, not a new cyclone engine.
+
+The scientific engine remains CCART v2, which continues to power synthetic cyclone generation, hazard modelling, calibration, and HWE allocation.
+
+The v3 repository includes:
+- cyclone module (Vizag‑focused workflow)
+- OSM building extraction for Vizag
+- hazard simulation wrapper (`hazard_simulated_v2.py`)
+- exposure, impact, vulnerability, calibration, and HWE modules
+- visualization utilities (`viz_v2.py`)
+- synthetic batch runner (`run_synthetic_batch.py`)
+- clean `.gitignore` and reproducible folder structure
+- example notebook for cyclone landfall + density maps
+
+Large datasets, QGIS projects, and synthetic catalogue outputs are intentionally excluded to keep the repository lightweight.
+
+---
+
+## Relationship Between v2 and v3
+
+### v2 = scientific engine
+- synthetic generator
+- hazard engine
+- calibration
+- HWE
+- multi‑scenario batch runner
+
+### v3 = repository architecture
+- public release
+- modular package structure
+- OSM + cyclone integration
+- ready for flood + heat modules in v4
+
+The full v2 synthetic catalogue (baseline / warm SST / high‑end) is not bundled, but the complete v2 pipeline is available for users to generate their own catalogues.
+
+---
+
+## Next Steps
+
+The v3 structure prepares CCART for:
+- flood module integration (v4)
+- heat module (tasmax anomalies)
+- national exposure model
+- multi‑hazard risk layers
+- future‑climate scenario expansion
+
 ---
 
 ## **CCART v2 — Synthetic Cyclone Impact Engine (2026)**
