@@ -27,13 +27,9 @@ build/
 # Outputs (DO NOT PUSH)
 # -------------------------
 outputs/
-outputs/*
-
-# Synthetic runs
 synthetic_runs/
 synthetic_runs_multi/
 diagnostics/
-
 
 # Maps and generated visuals
 *.png
@@ -49,38 +45,58 @@ diagnostics/
 *.nc
 *.grib
 *.grb
-*.geojson
-*.gpkg
-*.shp
-*.dbf
-*.prj
-*.shx
-*.cpg
-*.qmd
+*.h5
+*.parquet
 
 # -------------------------
-# Data folder (large datasets)
+# Data folder (ignore everything heavy)
 # -------------------------
-data/*.nc
-data/*.tif
-data/*.grib
-data/*.geojson
-data/*.gpkg
-data/*.shp
-data/*.dbf
-data/*.prj
-data/*.shx
-data/*.cpg
-data/*.zip
-data/*.xlsx
-data/*.csv
-
-# Allow small metadata files
+data/**
 !data/README.md
 
+# Ignore large vector datasets inside data/
+data/**/*.gpkg
+data/**/*.shp
+data/**/*.dbf
+data/**/*.prj
+data/**/*.shx
+data/**/*.cpg
+data/**/*.zip
+data/**/*.geojson   # ignore large geojsons in data/
+
+# Allow small geojsons in code folders
+!ccart/**/*.geojson
+
 # -------------------------
-# Logs
+# Environments
 # -------------------------
-*.log
-*.tmp
+venv/
+__pycache__/
+
+# -------------------------
+# Cache folders (ignore everywhere)
+# -------------------------
+cache/
+
+# -------------------------
+# QGIS
+# -------------------------
+qgis_project/
+
+# -------------------------
+# OS junk
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Flood module (ignore entirely)
+# -------------------------
+flood/**
+
+# -------------------------
+# VRT and aux files
+# -------------------------
+*.vrt
+*.aux.xml
 

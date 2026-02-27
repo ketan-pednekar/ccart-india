@@ -4,7 +4,7 @@ from datetime import datetime
 
 from ccart.synthetic.run_synthetic_cyclone_v2 import run_single_synthetic
 
-SCENARIOS = ["baseline", "warm_sst", "high_end"]
+SCENARIOS = ["warm_sst", "high_end"]
 
 def run_synthetic_batch_multi(n_runs_per_scenario=50):
     """
@@ -38,18 +38,29 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
         for i in range(1, n_runs_per_scenario + 1):
             run_id = f"run_{i:03d}"
             run_dir = os.path.join(scenario_dir, run_id)
+
+            # --- RESUME FIX: Skip completed runs ---
+            if os.path.exists(run_dir) and os.listdir(run_dir):
+                print(f"→ Scenario {scenario} | Run {i} already exists — skipping.")
+                continue
+
+            # Create folder only if missing
             os.makedirs(run_dir, exist_ok=True)
 
-            print(f"\n→ Scenario {scenario} | Run {i}/{n_runs_per_scenario}")
+            print(f"\n→ Scenario {scenario} | Starting run {i}/{n_runs_per_scenario}")
 
-            # Inject scenario into the environment
-            result = run_single_synthetic(
-                run_dir,
-                save_hazard=True,
-                save_track=True,
-                save_hazard_gpkg=True,
-                save_track_csv=True
-            )
+            # Run the engine
+            try:
+                result = run_single_synthetic(
+                    run_dir,
+                    save_hazard=True,
+                    save_track=True,
+                    save_hazard_gpkg=True,
+                    save_track_csv=True
+                )
+            except Exception as e:
+                print(f"⚠️ ERROR in run {i}, continuing: {e}")
+                continue
 
             if result == "RETRY":
                 retry_count += 1
@@ -65,6 +76,7 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
 
             scenario_rows.append(result)
             master_rows.append(result)
+
 
         print(f"\n=== Scenario '{scenario}' summary ===")
         print(f"  Valid storms : {valid_count}")
@@ -85,5 +97,5 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
 
 
 if __name__ == "__main__":
-    run_synthetic_batch_multi(n_runs_per_scenario=5)
+    run_synthetic_batch_multi(n_runs_per_scenario=500)
 

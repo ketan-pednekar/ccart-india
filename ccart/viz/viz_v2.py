@@ -85,10 +85,26 @@ def ccart_choropleth_v2(
             state_filter = [state_filter]
         gdf = gdf[gdf["state"].isin(state_filter)].copy()
 
+    # --- FIX 1: Drop dummy/missing states if still present ---
+    if "state" in gdf.columns:
+        gdf = gdf[gdf["state"].notnull()]
+        gdf = gdf[gdf["state"] != "0"]
+
+
     # ------------------------------------------------------------
     # 7. Clean geometry
     # ------------------------------------------------------------
     gdf["geometry"] = gdf["geometry"].buffer(0)
+
+    # --- FIX 2: Drop invalid / empty geometries ---
+    gdf = gdf[gdf["geometry"].notnull()]
+    gdf = gdf[gdf.geometry.is_valid]
+    gdf = gdf[~gdf.geometry.is_empty]
+
+    if gdf.empty:
+        print("Choropleth: no valid geometries after cleaning, skipping plot.")
+        return
+
 
     # ------------------------------------------------------------
     # 8. Ensure loss column exists
@@ -104,21 +120,28 @@ def ccart_choropleth_v2(
     # ------------------------------------------------------------
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-    gdf.plot(
-        column=loss_col,
-        ax=ax,
-        cmap=cmap,
-        legend=True,
-        edgecolor="black",
-        linewidth=0.2,
-        missing_kwds={"color": "lightgrey", "label": "No data"},
-    )
+    try:
+        gdf.plot(
+            column=loss_col,
+            ax=ax,
+            cmap=cmap,
+            legend=True,
+            edgecolor="black",
+            linewidth=0.2,
+            missing_kwds={"color": "lightgrey", "label": "No data"},
+        )
 
-    ax.set_title(title, fontsize=14)
-    ax.set_axis_off()
+        ax.set_aspect("equal")
+        ax.set_title(title, fontsize=14)
+        ax.set_axis_off()
 
-    if save_path is not None:
-        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        if save_path is not None:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
-    plt.close(fig)
+    except Exception as e:
+        print(f"WARNING: Choropleth failed (title='{title}'): {e}")
+
+    finally:
+        plt.close(fig)
+
 

@@ -6,8 +6,8 @@ from climada.hazard import Centroids, TropCyclone
 def build_hazard_from_tc_tracks(
     tc_tracks,
     corridor_deg: float = 1.5,
-    grid_res_deg: float = 0.025,
-    min_peak_wind_kn: float = 20.0,
+    grid_res_deg: float = 0.02,
+    min_peak_wind_kn: float = 25.0,
     verbose: bool = True,
 ):
     if tc_tracks.size != 1:
