@@ -145,7 +145,6 @@ def build_synthetic_cyclone(
 
 # ✅ **Inputs (Markdown Block)**
 
-```markdown
 ## 📥 Inputs
 
 | Parameter            | Type   | Description |
@@ -157,7 +156,7 @@ def build_synthetic_cyclone(
 | `top_n`             | int    | Number of PCA‑refined analogs to sample from. |
 | `wind_boost`        | float  | Global multiplier applied to intensity before perturbation. |
 | `scenario`          | str    | One of: `baseline`, `warm_sst`, `high_end`. Controls intensity + curvature. |
-```
+
 ---
 
 ## 📤 Outputs
@@ -228,28 +227,3 @@ These diagnostics help validate:
 
 ---
 
-## 🧭 Mermaid Flowchart — Synthetic Cyclone Generator
-
-```mermaid
-flowchart TD
-
-    A[Load Cleaned Historical Tracks] --> B[Filter for India + Landfall]
-    B --> C[Resample Tracks]
-    C --> D[DBSCAN Clustering]
-    D --> E[Select Largest Cluster]
-    E --> F[PCA Refinement]
-    F --> G[Weighted Analog Selection]
-
-    G --> H[Genesis Jitter (Ocean‑Only)]
-    H --> I[Track Perturbation<br/>Gaussian + Spline]
-    I --> J[Minimum Spacing Enforcement]
-
-    J --> K[Translation Speed Variety]
-    K --> L[Intensity Variety<br/>Peak + Decay + Shift]
-    L --> M[RMW Variety]
-    M --> N[Rainfall Variety]
-
-    N --> O[Pressure Sanity Checks]
-    O --> P[Reshape Variables]
-    P --> Q[Return Synthetic Cyclone]
-```
