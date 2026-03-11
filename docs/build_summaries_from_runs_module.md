@@ -222,13 +222,13 @@ flowchart TD
     %% --- Input Validation ---
     A[Start: TCTracks Input] --> B{Exactly One Storm?}
     B -- No --> Z[Error: Must Provide Single Storm]
-    B -- Yes --> C["Sanitize Track Variables\nReshape to 1‑D ('time',)"]
+    B -- Yes --> C["Sanitize Track Variables\nReshape to 1-D ('time',)"]
 
     %% --- Physical Fallbacks ---
     C --> D[Apply Physical Fallbacks]
     D --> D1["RMW Fallback\n30 km if all zeros"]
-    D --> D2["OCI Fallback\nClip 50–300 km"]
-    D --> D3["Pressure Delta Check\nEnsure ≥ 1 hPa"]
+    D --> D2["OCI Fallback\nClip 50-300 km"]
+    D --> D3["Pressure Delta Check\nEnsure >= 1 hPa"]
 
     %% --- Peak Wind ---
     D3 --> E[Compute Peak Wind]
@@ -237,15 +237,15 @@ flowchart TD
     E --> F{Peak Wind < Threshold?}
 
     %% --- Weak Storm Path ---
-    F -- Yes --> G["Weak‑Storm Branch\nBuild Corridor Grid"]
-    G --> H[Generate Zero‑Intensity Hazard]
+    F -- Yes --> G["Weak-Storm Branch\nBuild Corridor Grid"]
+    G --> H[Generate Zero-Intensity Hazard]
     H --> Y[Return Hazard]
 
     %% --- Normal Storm Path ---
-    F -- No --> I["Normal‑Storm Branch\nBounding Box ±1°"]
+    F -- No --> I["Normal-Storm Branch\nBounding Box +/- 1deg"]
     I --> J["Generate Centroid Grid\nnp.meshgrid()"]
     J --> K["Run CLIMADA Wind Model\nTropCyclone.from_tracks()"]
-    K --> L["Clean Intensities\nClip negatives → 0"]
+    K --> L["Clean Intensities\nClip negatives -> 0"]
     L --> M[Convert to CSR Sparse]
 
     %% --- Final Checks ---
