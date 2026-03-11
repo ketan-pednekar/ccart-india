@@ -216,30 +216,40 @@ This function enables CCART to operate as a scalable, multi‑hazard impact plat
 ## 🧭 Mermaid Flowchart — CCART Hazard Builder v2
 
 ```mermaid
+
 flowchart TD
 
+    %% --- Input Validation ---
     A[Start: TCTracks Input] --> B{Exactly One Storm?}
     B -- No --> Z[Error: Must Provide Single Storm]
-    B -- Yes --> C[Sanitize Track Variables<br/>Reshape to 1‑D ("time",)]
+    B -- Yes --> C["Sanitize Track Variables\nReshape to 1‑D ('time',)"]
 
+    %% --- Physical Fallbacks ---
     C --> D[Apply Physical Fallbacks]
-    D --> D1[RMW Fallback (30 km if all zeros)]
-    D --> D2[OCI Fallback (clip 50–300 km)]
-    D --> D3[Pressure Delta ≥ 1 hPa]
+    D --> D1["RMW Fallback\n30 km if all zeros"]
+    D --> D2["OCI Fallback\nClip 50–300 km"]
+    D --> D3["Pressure Delta Check\nEnsure ≥ 1 hPa"]
 
+    %% --- Peak Wind ---
     D3 --> E[Compute Peak Wind]
 
+    %% --- Branching Logic ---
     E --> F{Peak Wind < Threshold?}
-    F -- Yes --> G[Weak‑Storm Branch<br/>Build Corridor Grid]
+
+    %% --- Weak Storm Path ---
+    F -- Yes --> G["Weak‑Storm Branch\nBuild Corridor Grid"]
     G --> H[Generate Zero‑Intensity Hazard]
     H --> Y[Return Hazard]
 
-    F -- No --> I[Normal‑Storm Branch<br/>Bounding Box ±1°]
-    I --> J[Generate Centroid Grid<br/>np.meshgrid()]
-    J --> K[Run CLIMADA Wind Model<br/>TropCyclone.from_tracks()]
-    K --> L[Clean Intensities<br/>Clip negatives → 0]
+    %% --- Normal Storm Path ---
+    F -- No --> I["Normal‑Storm Branch\nBounding Box ±1°"]
+    I --> J["Generate Centroid Grid\nnp.meshgrid()"]
+    J --> K["Run CLIMADA Wind Model\nTropCyclone.from_tracks()"]
+    K --> L["Clean Intensities\nClip negatives → 0"]
     L --> M[Convert to CSR Sparse]
 
+    %% --- Final Checks ---
     M --> N[haz.check()]
     N --> Y[Return Hazard]
+```
 
