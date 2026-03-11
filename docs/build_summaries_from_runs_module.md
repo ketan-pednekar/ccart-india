@@ -251,5 +251,6 @@ flowchart TD
     %% --- Final Checks ---
     M --> N[haz.check()]
     N --> Y[Return Hazard]
+    
 ```
 
