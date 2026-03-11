@@ -143,7 +143,7 @@ def build_synthetic_cyclone(
 ```
 ---
 
-# ✅ **Inputs (Markdown Block)**
+# ✅ **Inputs**
 
 ## 📥 Inputs
 
