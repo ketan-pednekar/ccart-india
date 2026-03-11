@@ -4,6 +4,7 @@
 This document describes the logic, assumptions, and workflow behind the
 cyclone hazard engine implemented in `hazard.py`.
 
+---
 ## Overview
 
 The hazard module builds single-event tropical cyclone footprints from
@@ -13,6 +14,7 @@ It contains two main functions:
 - `build_hazard()`: construct a CLIMADA TropCyclone hazard object
 - `compute_district_hazard_stats()`: compute district-level hazard metrics
 
+---
 ## 1. Hazard Construction Workflow
 
 ### 1.1 Load IBTrACS Track
@@ -33,6 +35,7 @@ It contains two main functions:
 
 ### Output: A single-event TropCyclone hazard object.
 
+---
 ## 2. District-Level Hazard Statistics
 
 ### 2.1 Convert Centroids to GeoDataFrame
@@ -48,5 +51,6 @@ It contains two main functions:
 - Mean wind speed
 - Number of centroids per district
 
+---
 ### Output: DataFrame with district-level hazard metrics.
 
