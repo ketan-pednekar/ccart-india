@@ -87,7 +87,7 @@ def build_hazard_from_tc_tracks(
     min_peak_wind_kn: float = 25.0,
     verbose: bool = True,
 )
-
+```
 ## 📥 Inputs
 
 | Parameter          | Type       | Description |
