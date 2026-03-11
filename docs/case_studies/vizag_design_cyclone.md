@@ -164,24 +164,6 @@ These outputs form the basis for:
 - district‑level impact modelling  
 
 ---
-
-## 🧩 Workflow Diagram
-
-```mermaid
-flowchart TD
-
-A[Load CCART Cyclone Master Catalogue<br>~1100 synthetic storms] --> B[Filter Vizag‑relevant storms]
-B --> C[Remove incomplete tracks<br>track_length > 10]
-C --> D[Apply physical filters<br>- intensity > 30 m/s<br>- distance < 150 km<br>- landfall angle 60–90°]
-D --> E[Sort by closest distance<br>Select design cyclone]
-E --> F[Build CLIMADA‑compatible track dataset<br>(xarray + TCTracks)]
-F --> G[Generate hazard using CCART v2 engine]
-G --> H[Clip hazard to Vizag bounding box<br>(lat 17.4–18.0, lon 83.0–83.6)]
-H --> I[Export final hazard file<br>vizag_design_cyclone_hazard.h5]
-```
-
----
-
 ## 🔁 How to Reproduce This Case Study
 
 ### **1. Prepare the Environment**
