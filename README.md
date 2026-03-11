@@ -32,6 +32,52 @@ Large datasets, QGIS projects, and synthetic catalogue outputs are intentionally
 
 ---
 
+## 📘 Documentation (v3)
+
+CCART now includes a clean, modular documentation structure inside the `docs/` folder.  
+These pages explain the scientific logic, modelling philosophy, and reproducible workflows behind CCART.
+
+### 🔹 Key Documentation Pages
+
+- **Cyclone Methodology (v2 Engine)**  
+  `docs/methodology/cyclone_methodology.md`  
+  A complete explanation of the synthetic cyclone generator, track perturbations, hazard engine, and physical reasoning behind CCART.
+
+- **Vizag Design Cyclone Case Study**  
+  `docs/case_studies/vizag_design_cyclone.md`  
+  A full end‑to‑end example showing how CCART selects a representative design cyclone from 1100+ synthetic storms and generates a CLIMADA‑compatible hazard footprint.  
+  Includes:
+  - header figure  
+  - workflow diagram  
+  - reproducibility steps  
+  - limitations  
+  - uncertainty & sensitivity analysis  
+
+- **OSM Exposure Extraction (Vizag)**  
+  `docs/methodology/osm_extraction_vizag.md` *(optional placeholder)*  
+  Explains how OSM building footprints are extracted and prepared for hazard overlay.
+
+### 🔹 Documentation Structure
+
+```
+docs/
+   methodology/
+       cyclone_methodology.md
+       osm_extraction_vizag.md
+   case_studies/
+       vizag_design_cyclone.md
+   images/
+       vizag_design_cyclone_header.png
+```
+
+The documentation is designed to be:
+- **transparent** — every assumption is explicit  
+- **reproducible** — every workflow can be replicated  
+- **physically grounded** — no black‑box shortcuts  
+- **extensible** — ready for flood + heat modules in v4  
+
+---
+
 ## Relationship Between v2 and v3
 
 ### v2 = scientific engine

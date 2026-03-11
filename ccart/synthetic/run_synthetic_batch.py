@@ -4,7 +4,7 @@ from datetime import datetime
 
 from ccart.synthetic.run_synthetic_cyclone_v2 import run_single_synthetic
 
-SCENARIOS = ["warm_sst", "high_end"]
+SCENARIOS = ["baseline", "warm_sst", "high_end"]
 
 def run_synthetic_batch_multi(n_runs_per_scenario=50):
     """
@@ -53,11 +53,13 @@ def run_synthetic_batch_multi(n_runs_per_scenario=50):
             try:
                 result = run_single_synthetic(
                     run_dir,
+                    scenario=scenario,
                     save_hazard=True,
                     save_track=True,
                     save_hazard_gpkg=True,
                     save_track_csv=True
                 )
+
             except Exception as e:
                 print(f"⚠️ ERROR in run {i}, continuing: {e}")
                 continue
