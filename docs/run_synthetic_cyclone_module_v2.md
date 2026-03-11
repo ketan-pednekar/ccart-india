@@ -292,10 +292,10 @@ run_dir/
 
 16. **Aggregate to states**  
     Summarize calibrated and HWE losses at the state level.
-```
+
 17. **Save GPKG**  
     Write district
-```
+
 18. **Build state loss table**  
     Join state‑level losses back to district geometries.
 
