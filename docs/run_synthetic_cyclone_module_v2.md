@@ -306,23 +306,3 @@ run_dir/
     Save full storm‑level metadata for batch harness.
 
 ---
-## 🧭 Mermaid Flowchart — End‑to‑End Driver
-
-```mermaid
-flowchart TD
-
-A[Synthetic Track] --> B[TCTracks]
-B --> C[Synthetic Hazard v2]
-C --> D[Load Exposure]
-D --> E[Clip Exposure]
-E --> F[District Hazard Stats]
-F --> G[Hazard Mask + Inland Filter]
-G --> H[Vulnerability Curves]
-H --> I[Raw Impact]
-I --> J[District Aggregation]
-J --> K[DLNA Scaling]
-K --> L[Calibration (Coastal Only)]
-L --> M[HWE Weights]
-M --> N[District Outputs]
-N --> O[State Aggregation]
-O --> P[Maps + Metadata]
