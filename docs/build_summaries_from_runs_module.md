@@ -216,7 +216,6 @@ This function enables CCART to operate as a scalable, multi‑hazard impact plat
 ## 🧭 Mermaid Flowchart — CCART Hazard Builder v2
 
 ```mermaid
-
 flowchart TD
 
     %% --- Input Validation ---
