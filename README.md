@@ -1,3 +1,6 @@
+# CCART
+CCART is a country-agnostic physical climate risk framework. India is the reference implementation. The architecture is designed so that any country can be added by providing local boundary files and climate data — the pipeline handles the rest. CCART-UK is planned as the first international extension.
+
 # CCART v3 — Public Modular Release (Cyclone + OSM Vizag)
 
 <p align="left">
@@ -658,8 +661,8 @@ See `LICENSE` for details.
 If you use CCART in research, analysis, or publications, please cite it as:
 
 ```
-Pednekar, K. (2026). CCART: Cyclone Calibration and Risk Toolkit (India) – Pan‑India 15‑Cyclone Calibrated Release (v1.1).
-https://github.com/ketan-pednekar
+Pednekar, K. (2026). CCART: CCART: A Country-Agnostic Physical Climate Risk Framework —
+India Implementation. github.com/ketan-pednekar/ccart-india.
 ```
 
 For general reference to the methodology:
@@ -681,7 +684,7 @@ CCART is shaped by open-source principles, transparent methods, and collaborativ
 
 **Acknowledgements**
 - Appreciation to the open-source climate modelling community whose tools and ideas make reproducible risk analysis possible.
-- Thanks to Microsoft Copilot for collaborative support in debugging, structuring workflows, refining documentation, and shaping CCART into a clear, modular, and credible toolkit.
+- Developed with AI-assisted tooling for debugging and documentation.
 
 **How to Contribute**
 CCART welcomes collaboration from:
