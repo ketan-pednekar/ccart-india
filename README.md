@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19427627.svg)](https://doi.org/10.5281/zenodo.19427627)
+
 # CCART — Country‑Agnostic Climate Risk Framework
 
 *India Implementation (v3) — Cyclone + Flood Modules*
@@ -234,6 +236,11 @@ Released under the MIT License.
 ```bash
 Pednekar, K. (2026). CCART: A Country‑Agnostic Physical Climate Risk Framework — 
 India Implementation. github.com/ketan-pednekar/ccart-india.
+
+If you use CCART in your research, please cite:
+
+**Pednekar, K. (2025). CCART v3.0 — Climate Catastrophe Analysis & Risk Toolkit (India) [Software]. Zenodo.**  
+https://doi.org/10.5281/zenodo.19427627
 ```
 ---
 
