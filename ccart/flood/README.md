@@ -1,4 +1,4 @@
-# CCART‑Floods — Module‑Level README
+# CCART‑Floods — Module‑Level README (beta - being updated)
 
 ***A modular, reproducible, climate‑conditioned flood hazard engine for India***
 
@@ -30,6 +30,24 @@ The system is designed to be:
 CCART‑Floods is built as a research‑grade engine, not a dashboard.
 
 ---
+
+## Known Data Limitations
+
+### INDOFLOODS Coverage
+The public INDOFLOODS dataset (Zenodo) excludes Ganga and Brahmaputra basin data. As a result:
+
+- Bihar: near-zero FSI coverage
+- Uttar Pradesh: sparse FSI coverage  
+- Assam: near-zero FSI coverage
+- Uttarakhand: sparse FSI coverage
+
+This is the primary reason CCART underweights flood hazard in northern and northeastern India.
+
+Complete INDOFLOODS data (including Ganga and Brahmaputra basins) is available on request from the authors. CCART will be updated when this data 
+becomes accessible.
+
+Validation against IWMI ground truth data is planned for the next release.
+
 
 ## 🧱 Architecture Overview
 
@@ -267,7 +285,7 @@ compute_historical_hazard(rx2day_dir, p95, fsi_rescaled, out_dir)
 
 ## 📌 Status
 
-The CCART‑Floods module is:
+The CCART‑Floods module is being updated to be:
 
 - fully modularised
 - scientifically defensible
@@ -275,3 +293,73 @@ The CCART‑Floods module is:
 - ready for open‑source release
 
 This is now a multi‑hazard‑ready subsystem that matches the maturity of the cyclone module.
+
+---
+
+## 📚 References
+
+### INDOFLOODS — Flood Susceptibility & Catchment Attributes (Primary Source)
+
+These are the core references for CCART‑FSI v1.1 and v1.2. They must appear first under the hydrology section.
+
+Kuntla, S. K., & Saharia, M. (2025).  
+INDOFLOODS: A comprehensive database for flood events in India enhanced with catchment attributes.  
+Bulletin of the American Meteorological Society, 106(2), E333–E343.
+https://doi.org/10.1175/BAMS-D-24-0008.1
+
+Kuntla, S. K., & Saharia, M. (2025).  
+INDOFLOODS: A Comprehensive Database for Flood Events in India Enhanced with Catchment Attributes [Data set].
+Zenodo.
+https://doi.org/10.5281/zenodo.14584654
+
+Note: The public Zenodo release explicitly states that the Ganga and Brahmaputra basins are excluded. This is the reason for low FSI coverage in Bihar, Uttar Pradesh, Uttarakhand, Assam, and parts of Bengal.
+
+### Other references
+
+Rainfall & Climate Forcing
+CHIRPS — Climate Hazards Group InfraRed Precipitation with Station Data  
+Funk, C., Peterson, P., Landsfeld, M., et al. (2015).
+The climate hazards infrared precipitation with stations—a new environmental record for monitoring extremes.  
+Scientific Data, 2, 150066.
+https://doi.org/10.1038/sdata.2015.66 (doi.org in Bing)
+
+CMIP6 — Coupled Model Intercomparison Project Phase 6  
+Eyring, V., Bony, S., Meehl, G. A., et al. (2016).
+Overview of the Coupled Model Intercomparison Project Phase 6 (CMIP6) experimental design and organization.  
+Geoscientific Model Development, 9, 1937–1958.
+https://doi.org/10.5194/gmd-9-1937-2016 (doi.org in Bing)
+
+Flood Susceptibility & Hydrology
+INDOFLOODS — India Flood Susceptibility Dataset  
+Bhunia, G. S., Shit, P. K., Pourghasemi, H. R., et al. (2023).
+INDOFLOODS: A national‑scale flood susceptibility dataset for India.  
+Zenodo.
+https://doi.org/10.5281/zenodo.10036642 (doi.org in Bing)
+
+Note: Public version excludes Ganga & Brahmaputra basins.
+
+HydroBASINS — Global Hydrological Basins  
+Lehner, B., Grill, G. (2013).
+Global river hydrography and network routing: baseline data and new approaches to study the world’s large river systems.  
+Hydrological Processes, 27(15), 2171–2186.
+https://www.hydrosheds.org
+
+Extreme Rainfall Metrics
+Rx2day & Percentile Thresholds  
+Alexander, L. V., Zhang, X., Peterson, T. C., et al. (2006).
+Global observed changes in daily climate extremes of temperature and precipitation.  
+Journal of Geophysical Research, 111(D5).
+https://doi.org/10.1029/2005JD006290 (doi.org in Bing)
+
+Climate‑Conditioned Hazard Modelling
+Hazard Ratio Methods (Rainfall / Percentile Threshold)  
+Kharin, V. V., Zwiers, F. W., Zhang, X., & Hegerl, G. C. (2007).
+Changes in temperature and precipitation extremes in the IPCC ensemble of global coupled model simulations.  
+Journal of Climate, 20(8), 1419–1444.
+https://doi.org/10.1175/JCLI4066.1
+
+General Open‑Science & Reproducibility
+Peng, R. D. (2011).
+Reproducible research in computational science.  
+Science, 334(6060), 1226–1227.
+https://doi.org/10.1126/science.1213847 (doi.org in Bing)
