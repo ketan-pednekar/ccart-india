@@ -300,8 +300,6 @@ This is now a multi‑hazard‑ready subsystem that matches the maturity of the 
 
 ### INDOFLOODS — Flood Susceptibility & Catchment Attributes (Primary Source)
 
-These are the core references for CCART‑FSI v1.1 and v1.2. They must appear first under the hydrology section.
-
 Kuntla, S. K., & Saharia, M. (2025).  
 INDOFLOODS: A comprehensive database for flood events in India enhanced with catchment attributes.  
 Bulletin of the American Meteorological Society, 106(2), E333–E343.
