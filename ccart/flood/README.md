@@ -48,6 +48,7 @@ Coverage is severely limited in:
 
 Complete INDOFLOODS data including Ganga and Brahmaputra basins is available on request from the authors. FSI v2.0 will incorporate this data when available.
 
+These limitations do not affect the reproducibility of the pipeline; they only constrain the spatial completeness of susceptibility.
 
 ## 🧱 Architecture Overview
 
