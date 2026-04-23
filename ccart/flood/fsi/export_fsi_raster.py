@@ -5,17 +5,17 @@ CCART-Floods Framework
 
 Purpose
 -------
-Exports the final FSI v1.2 susceptibility raster (already rasterised,
+Exports the final FSI susceptibility raster (already rasterised,
 cleaned, and rescaled) to a CHIRPS-aligned GeoTIFF.
 
 This module writes the canonical CCART-Floods susceptibility layer:
 
-    ccart_floods_fsi_v1_2_rescaled.tif
+    ccart_floods_fsi_rescaled.tif
 
 Inputs
 ------
 - fsi_rescaled : 2D numpy array (float32)
-    Output of rasterise_clean_rescale_fsi()
+    Output of rasterise_clean_rescale_fsi() from rasterise_fsi.py
 - chirps_transform : affine.Affine
     Transform of CHIRPS grid
 - crs : str

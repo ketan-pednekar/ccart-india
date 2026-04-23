@@ -136,7 +136,7 @@ ccart/cyclone/README.md
 
 ## 🌧️ Flood Module (v1 Engine)
 
-Climate‑conditioned flood hazard for India
+Climate‑conditioned flood hazard for India (beta - being updated)
 
 The flood module integrates:
 

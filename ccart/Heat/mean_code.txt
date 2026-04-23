@@ -1,0 +1,278 @@
+# ⭐ 1. Imports & Paths
+
+import xarray as xr
+import geopandas as gpd
+import regionmask
+from pathlib import Path
+import matplotlib.pyplot as plt
+import numpy as np  
+
+DATA = Path("E:/Heat/Data")
+
+
+# ⭐ 2. Load India boundary + regionmask
+
+INDIA = gpd.read_file(
+    r"C:\CMIP_data\cmip6\Climada\Projects\ccart-india\ccart\data\boundaries\INDIA_DISTRICTS_FIXED.gpkg"
+).to_crs("EPSG:4326")
+
+RM_INDIA = regionmask.Regions(
+    outlines=INDIA.geometry.values,
+    names=INDIA["district"].tolist(),
+    numbers=list(range(len(INDIA))),
+    abbrevs=INDIA["statecode"].tolist()
+)
+
+
+# ⭐ 3. Reusable loader (multi‑file + clip)
+
+def load_and_clip(files):
+    ds = xr.open_mfdataset(
+        files,
+        combine="by_coords",
+        parallel=True,
+        engine="h5netcdf",
+        chunks={"time": 365}
+    )
+    mask3D = RM_INDIA.mask_3D(ds)
+    mask2D = mask3D.any("region")
+    return ds.where(mask2D)
+
+
+# ⭐ 4. Simple mean climatology (kept for possible future use)
+
+def climatology(ds, var, start, end):
+    period = ds[var].sel(time=slice(start, end))
+    return period.mean("time").load()
+
+
+# ⭐ 4b. Stull Wet‑Bulb Temperature (2011)
+
+def wet_bulb_temperature_stull(T_c, RH):
+    Tw = (T_c * np.arctan(0.151977 * np.sqrt(RH + 8.313659))
+          + np.arctan(T_c + RH)
+          - np.arctan(RH - 1.676331)
+          + 0.00391838 * RH**1.5 * np.arctan(0.023101 * RH)
+          - 4.686035)
+    return Tw
+
+
+def wet_bulb_stull_xr(T_c, RH):
+    return xr.apply_ufunc(
+        wet_bulb_temperature_stull,
+        T_c,
+        RH,
+        input_core_dims=[[], []],
+        dask="parallelized",
+        output_dtypes=[float],
+    )
+
+
+# ⭐ 5. Load historical datasets (tasmax + hurs)
+
+hist_tasmax_files = sorted((DATA / "historical" / "tasmax").glob("tasmax_day_ACCESS-CM2_historical_*.nc"))
+hist_hurs_files   = sorted((DATA / "historical" / "hurs").glob("hurs_day_ACCESS-CM2_historical_*.nc"))
+
+ds_hist_tasmax = load_and_clip(hist_tasmax_files)
+ds_hist_hurs   = load_and_clip(hist_hurs_files)
+
+# ⭐ Correct RH logic (historical)
+rh_min = float(ds_hist_hurs["hurs"].min())
+rh_max = float(ds_hist_hurs["hurs"].max())
+print("RH range (historical):", rh_min, rh_max)
+
+if rh_max <= 1.5:
+    print("Converting historical RH from fraction to %")
+    ds_hist_hurs["hurs"] *= 100
+
+ds_hist_hurs["hurs"] = ds_hist_hurs["hurs"].clip(0, 100)
+
+
+# ⭐ 6. Load SSP370 datasets (tasmax + hurs)
+
+ssp370_tasmax_files = sorted((DATA / "ssp370" / "tasmax").glob("tasmax_day_ACCESS-CM2_ssp370_*.nc"))
+ssp370_hurs_files   = sorted((DATA / "ssp370" / "hurs").glob("hurs_day_ACCESS-CM2_ssp370_*.nc"))
+
+ds_370_tasmax = load_and_clip(ssp370_tasmax_files)
+ds_370_hurs   = load_and_clip(ssp370_hurs_files)
+
+# ⭐ Correct RH logic (future)
+rh_min = float(ds_370_hurs["hurs"].min())
+rh_max = float(ds_370_hurs["hurs"].max())
+print("RH range (future, raw):", rh_min, rh_max)
+
+if rh_max <= 1.5:
+    print("Converting future RH from fraction to %")
+    ds_370_hurs["hurs"] *= 100
+
+ds_370_hurs["hurs"] = ds_370_hurs["hurs"].clip(0, 100)
+
+print("RH range (future, clipped):",
+      float(ds_370_hurs["hurs"].min()),
+      float(ds_370_hurs["hurs"].max()))
+
+
+# ⭐ 8. Annual‑max climatology (heat‑relevant) for tasmax
+
+def annual_max_climatology(ds, var, start, end):
+    period = ds[var].sel(time=slice(start, end))
+    annual_max = period.groupby("time.year").max("time")
+    return annual_max.mean("year").load()
+
+
+# ⭐ 9. Compute baseline & future tasmax climatology (annual max)
+
+baseline_tasmax = annual_max_climatology(ds_hist_tasmax, "tasmax", "1995-01-01", "2014-12-31")
+future370_tasmax = annual_max_climatology(ds_370_tasmax, "tasmax", "2081-01-01", "2100-12-31")
+
+
+# ⭐ 10. Compute tasmax anomaly (in °C)
+
+baseline_tasmax_C = baseline_tasmax - 273.15
+future370_tasmax_C = future370_tasmax - 273.15
+
+tasmax_anomaly_370 = future370_tasmax_C - baseline_tasmax_C
+
+
+# ⭐ 11. Compute WBT (full time series) — with time alignment
+
+common_time_hist = np.intersect1d(ds_hist_tasmax.time.values, ds_hist_hurs.time.values)
+T_hist = ds_hist_tasmax["tasmax"].sel(time=common_time_hist) - 273.15
+RH_hist = ds_hist_hurs["hurs"].sel(time=common_time_hist)
+Tw_hist = wet_bulb_stull_xr(T_hist, RH_hist)
+
+common_time_370 = np.intersect1d(ds_370_tasmax.time.values, ds_370_hurs.time.values)
+T_370 = ds_370_tasmax["tasmax"].sel(time=common_time_370) - 273.15
+RH_370 = ds_370_hurs["hurs"].sel(time=common_time_370)
+Tw_370 = wet_bulb_stull_xr(T_370, RH_370)
+
+
+# ⭐ 12. Memory‑safe days above 35°C WBT per year
+
+years_hist = np.unique(Tw_hist["time.year"])
+hist_days_35_list = []
+for y in years_hist:
+    days = (Tw_hist.sel(time=str(y)) > 35).sum("time").load()
+    days = days.assign_coords(year=y)
+    hist_days_35_list.append(days)
+hist_days_35 = xr.concat(hist_days_35_list, dim="year")
+
+years_future = np.unique(Tw_370["time.year"])
+fut_days_35_list = []
+for y in years_future:
+    days = (Tw_370.sel(time=str(y)) > 35).sum("time").load()
+    days = days.assign_coords(year=y)
+    fut_days_35_list.append(days)
+fut_days_35 = xr.concat(fut_days_35_list, dim="year")
+
+print(f"Historical days > 35°C WBT : {float(hist_days_35.mean()):.2f} days/year")
+print(f"Future days > 35°C WBT     : {float(fut_days_35.mean()):.2f} days/year")
+print(f"Change                      : +{float(fut_days_35.mean() - hist_days_35.mean()):.2f} days/year")
+
+
+# ============================================================
+# ⭐ DIAGNOSTICS: Validate WBT > 35°C maps and dataset integrity
+# ============================================================
+
+print("\n=== BASIC SHAPES ===")
+print("Tw_370 shape:", Tw_370.shape)
+print("fut_days_35 shape:", fut_days_35.shape)
+print("Unique future years:", years_future)
+
+# Mean over years (per-gridcell)
+m = fut_days_35.mean("year")
+
+print("\n=== GRIDCELL STATISTICS (Future WBT > 35°C) ===")
+print("Min:", float(m.min()))
+print("Max:", float(m.max()))
+print("Mean over India:", float(m.mean()))
+
+print("\n=== NaN CHECK ===")
+print("Any NaNs in m:", np.isnan(m.values).sum())
+
+# Flatten for distribution analysis
+vals = m.values.flatten()
+
+print("\n=== DISTRIBUTION CHECK ===")
+print("Gridcells == 0 days/year:", np.sum(vals == 0))
+print("Gridcells > 0.5 days/year:", np.sum(vals > 0.5))
+print("Gridcells > 1 day/year:", np.sum(vals > 1))
+print("Gridcells > 2 days/year:", np.sum(vals > 2))
+
+
+# ⭐ 13. Spatial maps
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+hist_days_35.mean("year").plot(
+    ax=axes[0], cmap="YlOrRd", vmin=0, vmax=1,
+    cbar_kwargs={"label": "Days/year"}
+)
+axes[0].set_title("Historical days > 35°C WBT\n(1995–2014)")
+axes[0].set_xlim(68, 98); axes[0].set_ylim(6, 38)
+
+fut_days_35.mean("year").plot(
+    ax=axes[1], cmap="YlOrRd", vmin=0, vmax=1,
+    cbar_kwargs={"label": "Days/year"}
+)
+axes[1].set_title("Future days > 35°C WBT\n(2081–2100, SSP370)")
+axes[1].set_xlim(68, 98); axes[1].set_ylim(6, 38)
+
+plt.tight_layout()
+plt.savefig("wbt35_comparison.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+
+# ⭐ 14. Threshold diagnostics
+
+# ⭐ 14. Threshold diagnostics (FIXED)
+
+thresholds = [28, 30, 32, 35]
+for thresh in thresholds:
+    
+    hist_list = []
+    for y in years_hist:
+        hist_list.append((Tw_hist.sel(time=str(y)) > thresh).sum("time").compute())
+    hist_days = float(np.mean(hist_list))
+
+    fut_list = []
+    for y in years_future:
+        fut_list.append((Tw_370.sel(time=str(y)) > thresh).sum("time").compute())
+    fut_days = float(np.mean(fut_list))
+
+    print(f"WBT > {thresh}°C:  Historical={hist_days:.2f}  Future={fut_days:.2f}  Change=+{fut_days-hist_days:.2f} days/year")
+
+
+# ⭐ 15. Memory‑safe annual‑max WBT climatology
+
+hist_max_list = []
+for y in years_hist:
+    max_y = Tw_hist.sel(time=str(y)).max("time").load()
+    max_y = max_y.assign_coords(year=y)
+    hist_max_list.append(max_y)
+Tw_hist_annual_max = xr.concat(hist_max_list, dim="year")
+Tw_hist_clim = Tw_hist_annual_max.mean("year")
+
+fut_max_list = []
+for y in years_future:
+    max_y = Tw_370.sel(time=str(y)).max("time").load()
+    max_y = max_y.assign_coords(year=y)
+    fut_max_list.append(max_y)
+Tw_370_annual_max = xr.concat(fut_max_list, dim="year")
+Tw_370_clim = Tw_370_annual_max.mean("year")
+
+Tw_anomaly_370 = Tw_370_clim - Tw_hist_clim
+
+
+# ⭐ 16. Darker, clearer tasmax anomaly plot
+
+tasmax_anomaly_370.plot(
+    cmap="coolwarm_r",
+    vmin=0,
+    vmax=8
+)
+plt.title("Tasmax Annual-Max Anomaly (2081–2100 vs 1995–2014) - SSP370")
+plt.xlim(68, 98)
+plt.ylim(6, 38)
+plt.show()
+

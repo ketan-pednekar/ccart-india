@@ -1,0 +1,18 @@
+baseline:
+  start: 1995
+  end: 2024
+
+future:
+  start: 2027
+  end: 2100
+
+grid:
+  chirps_resolution: 0.05
+  idw_resolution: 0.10
+
+fsi:
+  epsilon: 1e-6
+  # Add thresholds here later
+
+hazard:
+  # Add hazard constants here later

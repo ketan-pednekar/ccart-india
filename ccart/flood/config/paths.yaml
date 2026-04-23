@@ -1,0 +1,62 @@
+project_root: "C:/CMIP_data/cmip6/Climada/Projects/ccart-india"
+
+data:
+  indofloods:
+    catchment: "ccart/data/INDOFLOODS/catchment_characteristics_indofloods.csv"
+    events:    "ccart/data/INDOFLOODS/floodevents_indofloods.csv"
+    metadata:  "ccart/data/INDOFLOODS/metadata_indofloods.csv"
+    precip:    "ccart/data/INDOFLOODS/precipitation_variables_indofloods.csv"
+
+  hybas: "ccart/data/HYBAS/hybas_as_lev06_v1c.shp"
+  india_boundary: "ccart/data/boundaries/INDIA_DISTRICTS_FIXED.gpkg"
+
+chirps:
+  root: "D:/Climate Risk Data/CHIRPS_daily"
+  daily_dir: "D:/Climate Risk Data/CHIRPS_daily"
+  template: "ccart/outputs/chirps_india/chirps_india_template.tif"
+  clip_to_region: true
+  region_boundary: "ccart/data/boundaries/INDIA_DISTRICTS_FIXED.gpkg"
+
+cmip6:
+  processed_dir: "ccart/outputs/cmip6_ssp_india_fixed"
+
+  ACCESS-CM2:
+    ssp370:
+      pr_dir: "D:/Climate Risk Data/CMIP6_daily/ACCESS-CM2/SSP370"
+      tasmax_dir: "E:/Heat/Data/ssp370/tasmax"
+
+    ssp585:
+      pr_dir: "D:/Climate Risk Data/CMIP6_daily/ACCESS-CM2/SSP585"
+      tasmax_dir: "E:/Heat/Data/ssp585/tasmax"
+
+outputs:
+  root: "ccart/flood/outputs"
+  fsi: "ccart/flood/outputs/fsi"
+  dynamic_hazard: "ccart/flood/outputs/dynamic_hazard"
+
+flood:
+  inputs:
+    fsi: "ccart/flood/outputs/fsi/ccart_floods_fsi_static_chirps_rescaled.tif"
+    p95: "ccart/flood/outputs/p95/p95_chirps_2day.tif"
+    rx2_370: "ccart/flood/outputs/rx2/period_max/rx2max_ssp370_2027_2100_chirps.tif"
+    rx2_585: "ccart/flood/outputs/rx2/period_max/rx2max_ssp585_2027_2100_chirps.tif"
+    exposure: "E:/EMC_BUILT_INDIA_005deg_CLIPPED.tif"
+    pr_370: "ccart/outputs/cmip6_ssp_india_fixed/ACCESS-CM2/ssp370/pr.zarr"
+    pr_585: "ccart/outputs/cmip6_ssp_india_fixed/ACCESS-CM2/ssp585/pr.zarr"
+    fsi_uplift_370: "ccart/flood/outputs/fsi/fsi_uplift_ssp370.tif"
+    fsi_uplift_585: "ccart/flood/outputs/fsi/fsi_uplift_ssp585.tif"
+    chirps_india_zarr: "ccart/outputs/chirps_india/chirps_india_clipped.zarr"
+
+  outputs:
+    hazard: "ccart/flood/outputs/hazard"
+    fsi_uplift: "ccart/flood/outputs/fsi"
+    risk: "ccart/flood/outputs/risk/ccart_floods_static_risk_005deg_v1_ALIGNED.tif"
+    p95: "ccart/flood/outputs/p95"
+    rx2_chirps: "ccart/flood/outputs/rx2/chirps"
+    rx2_ssp370: "ccart/flood/outputs/rx2/ssp370"
+    rx2_ssp585: "ccart/flood/outputs/rx2/ssp585"
+    rx2_period_max: "ccart/flood/outputs/rx2/period_max"
+    fsi_static: "ccart/flood/outputs/fsi/ccart_floods_fsi_static_chirps_rescaled.tif"
+
+   
+

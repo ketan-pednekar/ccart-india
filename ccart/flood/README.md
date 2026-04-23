@@ -31,22 +31,22 @@ CCART‑Floods is built as a research‑grade engine, not a dashboard.
 
 ---
 
-## Known Data Limitations
+## Known FSI Limitations
 
-### INDOFLOODS Coverage
-The public INDOFLOODS dataset (Zenodo) excludes Ganga and Brahmaputra basin data. As a result:
+### INDOFLOODS Public Dataset Coverage
+The public INDOFLOODS dataset (Zenodo) contains 155 gauges. 
 
-- Bihar: near-zero FSI coverage
-- Uttar Pradesh: sparse FSI coverage  
-- Assam: near-zero FSI coverage
-- Uttarakhand: sparse FSI coverage
+Coverage is severely limited in:
 
-This is the primary reason CCART underweights flood hazard in northern and northeastern India.
+| State | Coverage | Reason |
+|-------|----------|--------|
+| Bihar | 0.3% | Only 3 Ganga basin gauges |
+| Uttarakhand | 0.0% | No gauges |
+| Punjab | 0.0% | No gauges |
+| Haryana | 0.0% | No gauges |
+| UP | 5.2% | Sparse coverage |
 
-Complete INDOFLOODS data (including Ganga and Brahmaputra basins) is available on request from the authors. CCART will be updated when this data 
-becomes accessible.
-
-Validation against IWMI ground truth data is planned for the next release.
+Complete INDOFLOODS data including Ganga and Brahmaputra basins is available on request from the authors. FSI v2.0 will incorporate this data when available.
 
 
 ## 🧱 Architecture Overview
@@ -299,8 +299,6 @@ This is now a multi‑hazard‑ready subsystem that matches the maturity of the 
 ## 📚 References
 
 ### INDOFLOODS — Flood Susceptibility & Catchment Attributes (Primary Source)
-
-These are the core references for CCART‑FSI v1.1 and v1.2. They must appear first under the hydrology section.
 
 Kuntla, S. K., & Saharia, M. (2025).  
 INDOFLOODS: A comprehensive database for flood events in India enhanced with catchment attributes.  

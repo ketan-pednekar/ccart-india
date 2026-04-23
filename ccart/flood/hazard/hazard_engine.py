@@ -1,154 +1,180 @@
 """
-Module: hazard_engine
-CCART-Floods Framework
--------------------------------------------------------------
+CCART Dynamic Flood Hazard Engine
 
-Purpose
--------
-Compute climate-conditioned flood hazard using:
-    H = FSI × max(Rx2day / P95, 0)
+For each scenario (SSP370, SSP585):
 
-This module provides:
-- a clean hazard computation function
-- year-by-year historical hazard loop (CHIRPS)
-- year-by-year future hazard loop (CMIP6 → CHIRPS reprojection)
+1. Load daily rainfall (ACCESS-CM2, CHIRPS-aligned, 2027–2100)
+2. Compute 2-day rolling rainfall
+3. Count exceedances over P95 (2-day)
+4. Multiply exceedance counts by FSI uplift (scenario-specific)
+5. Save annual hazard rasters:
 
-All operations are memory-safe and grid-aligned.
-
-Author
-------
-CCART Team
+   hazard_ssp370_YYYY.tif
+   hazard_ssp585_YYYY.tif
 """
 
-from pathlib import Path
 import numpy as np
 import xarray as xr
-from rasterio.warp import reproject, Resampling
-from rasterio.transform import from_bounds
-import gc
+import rasterio
+from pathlib import Path
+
+from ccart.flood.config import load_paths
+
+# ---------------------------------------------------------
+# PATHS
+# ---------------------------------------------------------
+
+paths = load_paths()
+project_root = Path(paths["project_root"])
+
+# CMIP6 daily rainfall (CHIRPS-aligned)
+pr_370_zarr = project_root / paths["flood"]["inputs"]["pr_370"]
+pr_585_zarr = project_root / paths["flood"]["inputs"]["pr_585"]
+
+# P95 (2-day rainfall)
+p95_path = project_root / paths["flood"]["inputs"]["p95"]
+
+# FSI uplift rasters
+fsi_uplift_370_path = project_root / paths["flood"]["inputs"]["fsi_uplift_370"]
+fsi_uplift_585_path = project_root / paths["flood"]["inputs"]["fsi_uplift_585"]
+
+# Output directory for hazard rasters
+hazard_out_dir = project_root / paths["flood"]["outputs"]["hazard"]
+hazard_out_dir.mkdir(parents=True, exist_ok=True)
 
 
-# ------------------------------------------------------------
-# CORE HAZARD FUNCTION
-# ------------------------------------------------------------
 
-def compute_hazard(rx2day_grid, p95_grid, fsi_on_chirps):
+# ---------------------------------------------------------
+# UTILITIES
+# ---------------------------------------------------------
+
+def load_raster(path):
+    with rasterio.open(path) as src:
+        arr = src.read(1).astype("float32")
+        profile = src.profile
+    return arr, profile
+
+
+def save_raster(path, array, profile):
+    profile = profile.copy()
+    profile.update(dtype="float32", compress="lzw")
+    with rasterio.open(path, "w", **profile) as dst:
+        dst.write(array.astype("float32"), 1)
+
+
+def load_pr_dataset(zarr_path):
+    # Assumes pr is already in mm/day and CHIRPS-aligned
+    ds = xr.open_zarr(zarr_path)
+    # Standard name: 'pr'; adjust here if different
+    if "pr" not in ds:
+        raise ValueError(f"'pr' variable not found in {zarr_path}")
+    return ds
+
+
+# ---------------------------------------------------------
+# HAZARD COMPUTATION
+# ---------------------------------------------------------
+
+def compute_hazard_for_scenario(
+    ds_pr,
+    p95_arr,
+    uplift_arr,
+    profile,
+    scenario_label,
+    start_year=2027,
+    end_year=2100,
+):
     """
-    Compute hazard = FSI × max(Rx2day / P95, 0).
-
-    Parameters
-    ----------
-    rx2day_grid : 2D ndarray
-    p95_grid    : 2D ndarray
-    fsi_on_chirps : 2D ndarray
-
-    Returns
-    -------
-    hazard : 2D float32 ndarray
+    ds_pr: xarray Dataset with variable 'pr' [time, lat, lon]
+    p95_arr: 2D numpy array [lat, lon]
+    uplift_arr: 2D numpy array [lat, lon]
+    profile: rasterio profile (from P95)
+    scenario_label: 'ssp370' or 'ssp585'
     """
-    rel = np.maximum(rx2day_grid / p95_grid, 0.0)
-    hazard = fsi_on_chirps * rel
-    return np.where(np.isfinite(fsi_on_chirps), hazard, np.nan).astype("float32")
 
+    pr = ds_pr["pr"]
 
-# ------------------------------------------------------------
-# HISTORICAL HAZARD LOOP (CHIRPS Rx2day)
-# ------------------------------------------------------------
+    # 2-day rolling sum along time
+    pr2 = pr.rolling(time=2).sum().isel(time=slice(1, None))
 
-def compute_historical_hazard(rx2day_dir: Path,
-                              p95_grid: np.ndarray,
-                              fsi_on_chirps: np.ndarray,
-                              out_dir: Path):
-    """
-    Compute historical hazard year-by-year using saved CHIRPS Rx2day arrays.
+    # group by year
+    pr2_year = pr2.groupby("time.year")
 
-    Saves one .npy per year.
-    """
-    out_dir.mkdir(exist_ok=True)
-
-    for npy_file in sorted(rx2day_dir.glob("rx2day_*.npy")):
-        yr = int(npy_file.stem.split("_")[1])
-        out_path = out_dir / f"hazard_hist_{yr}.npy"
-
-        if out_path.exists():
+    for year in range(start_year, end_year + 1):
+        if year not in pr2_year.groups:
             continue
 
-        rx2day = np.load(npy_file)
-        hazard = compute_hazard(rx2day, p95_grid, fsi_on_chirps)
+        print(f"[{scenario_label}] Computing hazard for year {year}...")
 
-        np.save(out_path, hazard)
+        # universal xarray-safe way to extract a group
+        indices = pr2_year.groups[year]      # integer positions of that year's timesteps
+        pr2_y = pr2.isel(time=indices)       # slice the original pr2 by those indices
 
-        del rx2day, hazard
-        gc.collect()
+        # exceedance count over P95
+        # broadcast p95_arr to match pr2_y shape
+        exceed = (pr2_y > p95_arr).sum(dim="time")
+
+        # to numpy
+        exceed_arr = exceed.values.astype("float32")
+
+        # apply FSI uplift (already carries Indo-Floods NaN mask)
+        hazard = exceed_arr * uplift_arr
+
+        # enforce NaN where uplift is NaN
+        mask_nan = np.isnan(uplift_arr)
+        hazard[mask_nan] = np.nan
+
+        out_path = hazard_out_dir / f"hazard_{scenario_label}_{year}.tif"
+        save_raster(out_path, hazard, profile)
 
 
-# ------------------------------------------------------------
-# FUTURE HAZARD LOOP (CMIP6 → CHIRPS)
-# ------------------------------------------------------------
+# ---------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------
 
-def compute_future_hazard(cmip_dir: Path,
-                          p95_grid: np.ndarray,
-                          fsi_on_chirps: np.ndarray,
-                          chirps_shape,
-                          chirps_transform,
-                          out_dir: Path,
-                          start_year: int,
-                          end_year: int):
-    """
-    Compute future hazard year-by-year using CMIP6 daily rainfall.
+if __name__ == "__main__":
 
-    Steps:
-    - compute Rx2day via xarray rolling window
-    - reproject CMIP6 grid → CHIRPS grid
-    - compute hazard
-    - save one .npy per year
-    """
-    out_dir.mkdir(exist_ok=True)
+    print("Loading P95 raster...")
+    p95_arr, profile = load_raster(p95_path)
 
-    cmip_files = sorted(cmip_dir.glob("*.nc"))
+    print("Loading FSI uplift SSP370...")
+    fsi_uplift_370, _ = load_raster(fsi_uplift_370_path)
 
-    for f in cmip_files:
-        ds = xr.open_dataset(f)
-        yr = int(ds.time.dt.year.values[0])
+    print("Loading FSI uplift SSP585...")
+    fsi_uplift_585, _ = load_raster(fsi_uplift_585_path)
 
-        if not (start_year <= yr <= end_year):
-            ds.close()
-            continue
+    print("Loading CMIP6 pr.zarr for SSP370...")
+    ds_370 = load_pr_dataset(pr_370_zarr)
 
-        out_path = out_dir / f"hazard_fut_{yr}.npy"
-        if out_path.exists():
-            ds.close()
-            continue
+    print("Loading CMIP6 pr.zarr for SSP585...")
+    ds_585 = load_pr_dataset(pr_585_zarr)
 
-        da = ds["pr"]  # mm/day
+    # Ensure shapes match
+    if p95_arr.shape != fsi_uplift_370.shape:
+        raise ValueError(f"P95 and FSI uplift 370 shapes differ: {p95_arr.shape} vs {fsi_uplift_370.shape}")
+    if p95_arr.shape != fsi_uplift_585.shape:
+        raise ValueError(f"P95 and FSI uplift 585 shapes differ: {p95_arr.shape} vs {fsi_uplift_585.shape}")
 
-        # Rx2day via rolling window
-        rx2day_xr = da.rolling(time=2, min_periods=2).sum().max(dim="time").values.astype("float32")
+    # SSP370
+    compute_hazard_for_scenario(
+        ds_pr=ds_370,
+        p95_arr=p95_arr,
+        uplift_arr=fsi_uplift_370,
+        profile=profile,
+        scenario_label="ssp370",
+        start_year=2027,
+        end_year=2100,
+    )
 
-        # Build CMIP transform
-        cmip_lats = da["lat"].values
-        cmip_lons = da["lon"].values
-        cmip_tf = from_bounds(
-            float(cmip_lons.min()), float(cmip_lats.min()),
-            float(cmip_lons.max()), float(cmip_lats.max()),
-            len(cmip_lons), len(cmip_lats)
-        )
+    # SSP585
+    compute_hazard_for_scenario(
+        ds_pr=ds_585,
+        p95_arr=p95_arr,
+        uplift_arr=fsi_uplift_585,
+        profile=profile,
+        scenario_label="ssp585",
+        start_year=2027,
+        end_year=2100,
+    )
 
-        # Reproject to CHIRPS grid
-        rx2day_reproj = np.zeros(chirps_shape, dtype="float32")
-        reproject(
-            source=rx2day_xr,
-            destination=rx2day_reproj,
-            src_transform=cmip_tf, src_crs="EPSG:4326",
-            dst_transform=chirps_transform, dst_crs="EPSG:4326",
-            resampling=Resampling.bilinear
-        )
-
-        # Hazard
-        hazard = compute_hazard(rx2day_reproj, p95_grid, fsi_on_chirps)
-        np.save(out_path, hazard)
-
-        del rx2day_xr, rx2day_reproj, hazard
-        ds.close()
-        gc.collect()
-
+    print("Dynamic hazard engine complete.")
