@@ -39,7 +39,7 @@ fsi_uplift_370_path = project_root / paths["flood"]["inputs"]["fsi_uplift_370"]
 fsi_uplift_585_path = project_root / paths["flood"]["inputs"]["fsi_uplift_585"]
 
 # Output directory for hazard rasters
-hazard_out_dir = project_root / paths["flood"]["outputs"]["hazard"]
+hazard_out_dir = project_root / paths["flood"]["outputs"]["hazard_annual"]
 hazard_out_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -74,6 +74,36 @@ def load_pr_dataset(zarr_path):
 # ---------------------------------------------------------
 # HAZARD COMPUTATION
 # ---------------------------------------------------------
+# ---------------------------------------------------------
+# CCART Dynamic Flood Hazard Engine — v1.0 (Method Update)
+#
+# IMPORTANT METHODOLOGICAL CHANGE:
+#
+# Earlier CCART prototypes defined hazard as:
+#     H = FSI × max(Rx2day / P95, 0)
+#
+# This mixed rainfall magnitude with susceptibility and
+# produced values that were not stable across years.
+#
+# In CCART-Floods v1.0, hazard is redefined as:
+#     H = N_exceed × FSI_uplift
+#
+# where:
+#   N_exceed   = annual count of 2-day rainfall exceedances above P95
+#   FSI_uplift = scenario-conditioned susceptibility multiplier
+#
+# This new formulation:
+#   - emphasises frequency of extreme rainfall events
+#   - removes interpolation artifacts (IDW removed entirely)
+#   - preserves the Indo-Floods empirical mask
+#   - produces stable, scenario-consistent hazard fields
+#
+# NOTE:
+#   Hazard values from v1.0 are NOT comparable to earlier
+#   experimental versions. This release should be treated as
+#   the first stable, citable CCART-Floods hazard definition.
+# ---------------------------------------------------------
+
 
 def compute_hazard_for_scenario(
     ds_pr,

@@ -1,45 +1,32 @@
-# CCART‑Floods — Unified FSI Builder (`compute_fsi.py`)
+## FSI v1.1 — Empirical IndoFloods Susceptibility
 
-## Purpose
+### Inputs
 
-`compute_fsi.py` constructs the **Flood Susceptibility Index (FSI)** used by the CCART‑Floods hazard engine.
+- IndoFloods catchment descriptors (catchment_characteristics_indofloods.csv)
+- IndoFloods metadata (metadata_indofloods.csv)
 
-It unifies two stages of susceptibility modelling:
+### New in v2
 
-- **FSI v1.1** — empirical IndoFloods geomorphology + soils
-- **FSI v1.2** — hydrology‑enhanced susceptibility using HydroBASINS
+- Basin names are cleaned and standardised before merging
+- A basin‑name audit prints unique names and counts (diagnostic only)
 
-The final output is a **0–1 susceptibility index** (with NaN for ungauged basins) that represents how **naturally flood‑prone each catchment is**, independent of rainfall.
+### Variables Used
 
-This FSI is multiplied with rainfall anomalies to produce **climate‑conditioned flood hazard**.
+| Variable             | Why It Matters                                   |
+|----------------------|--------------------------------------------------|
+| Drainage Density     | Controls runoff concentration                    |
+| Catchment Relief     | Steeper basins → flashier floods                |
+| Ruggedness Number    | Terrain complexity                               |
+| Elongation Ratio     | Basin shape → hydrograph response                |
+| Form Factor          | Width/length ratio                               |
+| Annual Precipitation | Climatic forcing                                 |
+| Soil Type            | Infiltration/runoff behaviour                    |
 
----
+All numeric variables are **min–max normalised**.
 
-## Scientific Background
+Soils are **one‑hot encoded** and averaged into a composite `Soil_block`.
 
-FSI is a **catchment‑scale susceptibility index**, not a flood depth or inundation model.
-It captures the *intrinsic* tendency of a basin to generate floods when rainfall occurs.
-
----
-
-### Stage 1 — FSI v1.1 (IndoFloods empirical susceptibility)
-
-IndoFloods provides catchment‑level descriptors for each gauge:
-
-| Variable | Meaning | Why It Matters |
-|----------|---------|----------------|
-| Drainage Density | Total stream length / basin area | Higher density → faster runoff |
-| Catchment Relief | Elevation difference | Steeper basins → flashier floods |
-| Ruggedness Number | Relief × drainage density | Terrain complexity indicator |
-| Elongation Ratio | Basin shape metric | Circular basins flood faster |
-| Form Factor | Width/length ratio | Controls hydrograph shape |
-| Annual Precipitation | Long-term rainfall | Climatic forcing |
-| Soil Type | Categorical soil class | Controls infiltration/runoff |
-
-Each variable is **min–max normalised** to 0–1.
-Soil categories are one‑hot encoded and averaged into a composite `Soil_block`.
-
-**FSI v1.1 formula:**
+### FSI v1.1 formula
 
 ```python
 FSI_v1_1 = mean([
@@ -52,73 +39,100 @@ FSI_v1_1 = mean([
     Soil_block
 ])
 ```
-This produces a **0–1 empirical susceptibility score** for each gauge.
+The output is a **GeoDataFrame** with point geometry (EPSG:4326).
 
-### Stage 2 — FSI v1.2 (Hydrology‑enhanced susceptibility)
+---
 
-HydroBASINS provides basin polygons and hydrological attributes:
+## FSI v1.2 — Hydrology‑Enhanced Susceptibility
 
-| Variable | Meaning | Why It Matters |
-|----------|---------|----------------|
-| UP_AREA | Total upstream contributing area | Larger upstream → more inflow → higher susceptibility |
-| SUB_AREA | Area of the basin polygon | Basin size context |
-| ORDER | Strahler stream order | Maturity of river network |
-| n_gauges | Number of IndoFloods gauges in basin | Indicates empirical support |
-| Proxy_flag | 1 = no gauges, 0 = has gauges | Used to mask ungauged basins |
+### Inputs
 
-Each hydrological variable is **normalised to 0–1**.
+- HydroBASINS L06 polygons
+- India boundary (for spatial filtering)
+- Output of FSI v1.1
 
-Gauges are spatially joined to basins.
+| File            | Description                                      |
+|-----------------|--------------------------------------------------|
+| CATCHMENT_CSV   | IndoFloods geomorphology + soil descriptors      |
+| META_CSV        | Gauge metadata (coordinates, basin, state)       |
+| EVENTS_CSV      | IndoFloods flood event metadata (not used here)  |
+| PRECIP_CSV      | IndoFloods precipitation variables (not used)    |
+| HYBAS_SHP       | HydroBASINS polygons with hydrological attributes|
+| INDIA_SHP       | India boundary for spatial filtering             |
 
-Basins with **no IndoFloods gauges** are marked as:
+
+### Variables Used
+
+| Variable  | Meaning                                | Why It Matters                                  |
+|-----------|-----------------------------------------|--------------------------------------------------|
+| UP_AREA   | Total upstream contributing area        | Larger upstream → more inflow → higher risk     |
+| SUB_AREA  | Area of the basin polygon               | Basin size context                               |
+| ORDER     | Strahler stream order                   | Maturity of river network                        |
+| n_gauges  | Number of IndoFloods gauges in basin    | Indicates empirical support                      |
+| Proxy_flag| 1 = no gauges, 0 = has gauges           | Used to mask ungauged basins                    |
+
+### Steps
+
+**1. Filter HydroBASINS to India**
+
+Only basins intersecting India are retained.
+
+**2. Identify empirical vs proxy basins**
+
+A spatial join counts how many IndoFloods gauges fall inside each basin:
 
 ```python
-Proxy_flag = 1
+n_gauges = number of IndoFloods gauges in basin
+Proxy_flag = 1 if n_gauges == 0 else 0
 ```
-These basins are masked (set to NaN) to avoid false confidence.
 
-**FSI v1.2 formula:**
+Basins with no gauges are **proxy basins** and will be masked.
+
+**3. Assign hydrological attributes**
+
+Each gauge inherits:
+
+- `UP_AREA`
+- `SUB_AREA`
+- `ORDER`
+- `Proxy_flag`
+
+**4. Normalise hydrological variables**
+
+```python
+UP_AREA_norm
+SUB_AREA_norm
+ORDER_norm
+```
+
+**5. Compute FSI v1.2**
 
 ```python
 FSI_v1_2 = 0.5 * FSI_v1_1 + 0.5 * UP_AREA_norm
 ```
 
-This blends empirical susceptibility with hydrological context.
-
-**Final Output**
-
-The recommended FSI for CCART‑Floods is:
+**6. Apply proxy mask**
 
 ```python
-FSI = FSI_v1_2 (masked for proxy basins)
+FSI_masked = NaN if Proxy_flag == 1 else FSI_v1_2
 ```
-This is a **0–1 susceptibility raster** after spatialisation and rasterisation.
 
----
+This ensures CCART does **not** assign false confidence to ungauged basins.
 
-## Inputs
+### Final Output
 
-| File | Description |
-|------|-------------|
-| `CATCHMENT_CSV` | IndoFloods geomorphology + soil descriptors |
-| `META_CSV` | Gauge metadata (coordinates, basin, state) |
-| `HYBAS_SHP` | HydroBASINS polygons with hydrological attributes |
-| `INDIA_SHP` | India boundary for masking and spatial filtering |
+`compute_fsi()` returns a **GeoDataFrame** with the following key columns:
 
+| Column       | Meaning                                                |
+|--------------|--------------------------------------------------------|
+| FSI_v1_1     | Empirical susceptibility (IndoFloods only)             |
+| FSI_v1_2     | Hydrology‑enhanced susceptibility (IndoFloods + HYBAS) |
+| FSI_masked   | Final recommended FSI (NaN for proxy basins)           |
+| HYBAS_ID     | HydroBASINS Level‑06 basin ID                          |
+| Proxy_flag   | 1 = ungauged basin, 0 = empirical basin                |
+| geometry     | Point geometry (EPSG:4326)                             |
 
-All paths are loaded from `paths.yaml` via `load_paths()`.
-
----
-
-## Outputs
-
-| Output | Description |
-|--------|-------------|
-| `GeoDataFrame` | Gauge-level susceptibility with FSI v1.1 and FSI v1.2 |
-| `FSI_masked` | Final susceptibility (0–1, NaN for proxy basins) |
-| `geometry` | EPSG:4326 point geometry for each gauge |
-
-This output is ready for rasterisation and direct use in the hazard engine.
+This output is ready for **rasterisation to the CHIRPS grid**.
 
 ---
 
@@ -128,42 +142,13 @@ This output is ready for rasterisation and direct use in the hazard engine.
 
 Builds empirical susceptibility using IndoFloods descriptors.
 
-Steps:
-
-1. Load catchment descriptors + metadata
-2. Normalise geomorphology
-3. Encode soil types
-4. Compute Soil_block
-5. Compute FSI v1.1 (0–1)
-6. Return GeoDataFrame with point geometry
-
----
-
 `compute_fsi_v1_2(gdf_v1_1)`
 
-Adds hydrological context using HydroBASINS.
-
-Steps:
-
-1. Load HydroBASINS + India boundary
-2. Identify proxy basins (no gauges)
-3. Spatial join gauges → basins
-4. Normalise hydrological variables
-5. Compute FSI v1.2
-6. Apply proxy mask
-7. Return enhanced GeoDataFrame
-
----
+Adds hydrological context and proxy masking.
 
 `compute_fsi()`
 
-Unified entry point.
-
-Steps:
-
-1. Compute FSI v1.1
-2. Compute FSI v1.2
-3. Return final susceptibility layer
+Unified entry point returning the final susceptibility layer.
 
 ---
 
@@ -179,11 +164,11 @@ print(gdf_fsi[["GaugeID", "FSI_masked"]].head())
 
 ## Notes
 
-- FSI is a **susceptibility index**, not a flood depth or probability.
-- All variables are **normalised** to ensure equal weighting.
-- Proxy basins (no IndoFloods gauges) are masked to avoid over‑interpretation.
+- FSI is static and does not depend on rainfall.
+- Proxy basins are masked to avoid over‑interpretation.
 - FSI is rasterised to the CHIRPS grid before entering the hazard engine.
--  The final hazard is computed as:
+- Hazard is computed later as:
+
     ```python
     Hazard = FSI × Rainfall Anomaly
     ```

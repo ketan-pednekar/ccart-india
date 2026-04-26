@@ -1,174 +1,155 @@
-# 📘 CCART‑Floods — CHIRPS → Zarr Conversion (`process_chirps_to_zarr.py`)
+# CCART‑Floods — CHIRPS → Zarr Preprocessing (`process_chirps_to_zarr.py`)
 
-***Builds the canonical historical rainfall cube for CCART‑Floods (aligned with CHIRPS + CMIP6 grids)***
+**Canonical preprocessing of CHIRPS daily rainfall into a historical Zarr cube**
 
-# 1. Purpose
+---
 
-`process_chirps_to_zarr.py` converts daily CHIRPS rainfall rasters into a **single, continuous Zarr rainfall cube** aligned with the CHIRPS/FSI reference grid.
+## 🌐 Purpose
 
-This Zarr store becomes the **historical rainfall backbone** for all CCART‑Floods diagnostics and hazard modules.
+This preprocessing script converts **daily CHIRPS rainfall rasters** into a **continuous historical rainfall cube** stored in **Zarr format**, clipped to the India grid and aligned with CMIP6 Zarr stores.
 
-The output is used for:
+The output Zarr dataset is used for:
 
-- **RX1day / RX2day** rainfall diagnostics
-- **Static FSI baseline** (flood susceptibility)
+- **RX1day / RX2day diagnostics**
+- **Static FSI baseline**
 - **Exposure alignment**
 - **Historical hazard validation**
-- **Climate uplift calculations**
-- **CMIP6 comparison and delta‑hazard workflows**
+- **CHIRPS‑aligned grid for CMIP6 regridding**
 
-The final dataset is written to:
+---
 
-```python
-ccart/outputs/chirps_india/chirps.zarr
-```
+## 📥 Inputs
 
-# 2. What This Module Does
+| Input | Description |
+|-------|-------------|
+| CHIRPS daily rasters | Year‑wise folders containing daily GeoTIFF rainfall files |
+| `paths.yaml` | Provides CHIRPS root directory and clipping configuration |
+| `chirps_ingest.load_chirps()` | Supplies file inventory, clipping geometry, canonical grid, and daily loader |
+| Date fields (`year`, `month`, `day`) | Extracted from filenames using flexible regex |
 
-### 2.1 Loads CHIRPS metadata and grid
+Daily CHIRPS filenames may follow any of these patterns:
 
-The script calls:
+`YYYY.MM.DD.tif`
+`YYYY-MM-DD.tif`
+`YYYY_MM_DD.tif`
+
+---
+
+## 📤 Outputs
+
+| Output | Description |
+|--------|-------------|
+| `ccart/outputs/chirps_india/chirps.zarr` | Continuous daily rainfall Zarr store |
+| Variable: `pr` | Daily rainfall (mm/day), float32 |
+| Coordinates | `time`, `lat`, `lon` |
+| Grid | CHIRPS/FSI canonical 0.05° grid |
+| Time span | Determined by available CHIRPS years |
+| Metadata | Includes description + CHIRPS source path |
+
+---
+
+## 🔬 Methodology
+
+### 1. Load CHIRPS ingestion metadata
 
 ```python
 ch = load_chirps()
+years = ch["years"]
+load_day = ch["load_day"]
+lats = ch["lats"]
+lons = ch["lons"]
 ```
 This provides:
 
-- `file_df` — inventory of all daily CHIRPS rasters
-- `years` — sorted list of available years
-- `lats`, `lons` — CHIRPS grid coordinates
-- `load_day` — callable to load + clean + clip each raster
-- `transform`, `crs` — reference grid metadata
+- File inventory
+- Clipping geometry
+- Canonical CHIRPS grid
+- Callable daily loader
 
-This ensures the Zarr cube is **perfectly aligned** with:
-
-- CHIRPS baseline
-- FSI rasters
-- CMIP6 regridded rainfall
-- all downstream hazard modules
-
-### 2.2 Iterates year‑by‑year (memory‑safe)
+### 2. Loop year‑wise and load all valid days
 
 For each year:
 
-1. All daily rasters are loaded
-2. Invalid days are skipped with warnings
-3. Cleaned arrays are stacked into a (`time`, `lat`, `lon`) cube
-4. A proper daily time coordinate is constructed using `cftime_range`
-
-This avoids loading the entire CHIRPS archive into memory.
-
-### 2.3 Builds a clean xarray Dataset
-
-Each year is converted into:
+- Read all daily rasters
+- Clean invalid values (handled by load_day())
+- Collect valid dates
+- Stack into a (time, ny, nx) array
 
 ```python
-Dataset({
-    "pr": (("time", "lat", "lon"), arr)
-})
+arr = np.stack(daily_arrays, axis=0)
 ```
-with coordinates:
 
-- `time` — daily timestamps
-- `lat`, `lon` — CHIRPS grid centers
+### 3. Build time coordinate
 
-and metadata:
-
-- description
-- CHIRPS source directory
-
-All arrays are stored as `float32` to reduce disk footprint and maintain consistency with CMIP6 Zarr stores.
-
-### 2.4 Writes to Zarr (append‑safe)
-
-The first year is written with:
+Uses CF‑compliant cftime:
 
 ```python
-mode="w"
+time = xr.cftime_range(start=valid_dates[0], periods=len(valid_dates), freq="D")
 ```
-Subsequent years are appended with:
+
+### 4. Construct Xarray Dataset
 
 ```python
-mode="a", append_dim="time"
+ds = xr.Dataset(
+    {"pr": (("time", "lat", "lon"), arr.astype("float32"))},
+    coords={"time": time, "lat": lats, "lon": lons},
+    attrs={
+        "description": "CHIRPS daily rainfall (mm/day), clipped to India",
+        "source": chirps_cfg["root"],
+    },
+)
 ```
-This produces a **single continuous rainfall cube** from baseline start → baseline end.
+
+### 5. Write to Zarr (append year‑wise)
+
+- First year → `mode="w"`
+- Subsequent years → `mode="a"` with `append_dim="time"`
+
+```python
+ds.to_zarr(out_path, mode="a", append_dim="time")
+```
+
+## 📐 Unit Conversions
+
+CHIRPS is already in **mm/day**, so no unit conversion is applied here.
+
+For completeness, CCART‑standard formulas:
+
+
+### Precipitation (pr)
+
+```
+pr_mm_per_day = pr_kg_m2_per_s * 86400
+```
+
+### Maximum Temperature (tasmax)
+
+```
+tasmax_C = tasmax_K - 273.15
+```
+
+(Used in CMIP6 preprocessing, not CHIRPS.)
 
 ---
 
-## 3. Output Structure
+## ▶️ Usage
 
-The final Zarr store contains:
-
-```python
-chirps.zarr/
-    pr/          # daily rainfall (mm/day)
-    time/        # daily timestamps
-    lat/         # CHIRPS latitude centers
-    lon/         # CHIRPS longitude centers
-    .zmetadata   # consolidated metadata
-```
-All arrays are:
-
-- `float32`
-- cleaned
-- clipped (if enabled in `paths.yaml`)
-- aligned to the CHIRPS/FSI grid
-
----
-
-## 4. Usage
-
-**Command‑line**
+### Run preprocessing
 
 ```bash
-python ccart/flood/preprocess/process_chirps_to_zarr.py
+python process_chirps_to_zarr.py
 ```
 
-**Inside Python**
+### Output location
 
-```python
-from ccart.flood.preprocess.process_chirps_to_zarr import process_chirps_to_zarr
-
-process_chirps_to_zarr()
-```
----
-
-## 5. Notes & Design Choices
-
-- **Zarr is chosen** for:
-    - chunked storage
-    - fast random access
-    - compatibility with CMIP6 Zarr stores
-    - cloud‑ready workflows
-- **Time coordinate uses** `cftime_range`  
-    Ensures compatibility with non‑standard calendars if needed.
--  **Daily rasters are cleaned**  
-    Negative, non‑finite, and extreme (>500 mm/day) values are set to 0.
-- **Clipping is inherited from** `ingest_chirps.py`  
-    If `clip_to_region: true`, the Zarr cube is region‑specific.
--  **This script does not resample or change resolution**  
-    CHIRPS remains at native 0.05°.
-- **This is an overnight job**  
-    CHIRPS ingestion is I/O‑heavy; long runtimes are expected.
+`ccart/outputs/chirps_india/chirps.zarr`
 
 ---
 
-## 6. Why This Matters
+## 🧭 Notes
 
-This Zarr cube is the **single source of truth** for historical rainfall in CCART.
-Every rainfall‑driven diagnostic — from Rx2day to flood susceptibility — depends on this dataset being:
-
-- clean
-- continuous
-- reproducible
-- grid‑aligned
-- scientifically defensible
-
-This script ensures that.
-
-## 7. Output Path
-
-```python
-ccart/outputs/chirps_india/chirps.zarr
-```
-This folder is created automatically if missing.
+- Produces a **continuous, clean, CHIRPS‑aligned** rainfall cube
+- Perfectly aligned with CMIP6 Zarr stores for future hazard modelling
+- No hardcoded paths — fully config‑driven
+- Skips unreadable days with warnings
+- Ensures reproducibility for hazard engines and diagnostics

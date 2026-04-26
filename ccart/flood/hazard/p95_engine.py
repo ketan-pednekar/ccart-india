@@ -92,6 +92,10 @@ def compute_p95(transform):
 
     arr = p95.values.astype("float32")
 
+    # Remove quantile dimension if present
+    if arr.ndim == 3:
+        arr = arr.squeeze(axis=0)
+
     out_path = p95_dir / "p95_chirps_2day.tif"
     save_tif(out_path, arr, transform)
 

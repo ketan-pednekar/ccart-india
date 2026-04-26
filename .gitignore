@@ -46,11 +46,14 @@ diagnostics/
 *.vrt
 *.aux.xml
 
+# Optional: ignore Zarr stores
+# *.zarr/
+
 # ============================================================
 # DATA FOLDER (IGNORE EVERYTHING HEAVY)
 # ============================================================
 data/**
-!data/README.md        # allow a small README inside data/
+!data/README.md
 
 # Ignore large vector datasets inside data/
 data/**/*.gpkg
@@ -60,7 +63,7 @@ data/**/*.prj
 data/**/*.shx
 data/**/*.cpg
 data/**/*.zip
-data/**/*.geojson      # ignore large geojsons in data/
+data/**/*.geojson
 
 # Allow small geojsons inside code folders (e.g., masks)
 !ccart/**/*.geojson
@@ -87,4 +90,14 @@ qgis_project/
 # ============================================================
 .DS_Store
 Thumbs.db
+
+# Optional: logs and temp files
+# *.log
+# logs/
+# *.csv
+
+#----------
+# gpkg files
+#-----------
+ccart/data/boundaries/*.gpkg
 

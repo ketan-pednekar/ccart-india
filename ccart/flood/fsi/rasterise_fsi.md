@@ -1,98 +1,151 @@
-# CCART‑Floods — FSI Rasterisation (`rasterise_fsi.py`)
+# CCART‑Floods — FSI Rasteriser (`rasterise_fsi.py`)
 
 ## Purpose
-`rasterise_fsi.py` converts point‑based **FSI values** into a CHIRPS‑aligned
-raster. This module performs **no interpolation** — it rasterises only empirical
-values, cleans them, and rescales them to produce the canonical susceptibility
-layer used by the CCART‑Floods hazard engine.
 
-This module performs three steps:
+`rasterise_fsi.py` converts the **gauge‑level Flood Susceptibility Index (FSI)** into a **continuous CHIRPS‑aligned raster** using **basin‑wise assignment** from HydroBASINS Level‑06 polygons.
 
-1. **Rasterise** `FSI_masked` to the CHIRPS grid  
-2. **Clean** values (retain only 0–1, else NaN)  
-3. **Rescale** valid values to the full 0–1 range  
+This is the **canonical CCART‑Floods method** for generating a hydrologically meaningful susceptibility surface.
 
-The output is a CHIRPS‑aligned susceptibility raster ready for export.
+It replaces point burn‑in and ensures:
+
+- complete India‑wide coverage
+- hydrologically consistent susceptibility fields
+- perfect alignment with the CHIRPS 0.05° grid
+- suitability for downstream hazard modelling and CCART‑Number
 
 ---
 
-## Scientific Background
+## Pipeline Overview
 
-FSI is computed at gauge locations. To integrate susceptibility with
-rainfall hazards (CHIRPS, CMIP6), it must be aligned to the same grid.
+1. Load HYBAS L06 polygons
+2. Spatially join gauge‑level FSI → HYBAS basins
+3. Aggregate FSI per basin (mean of gauges)
+4. Merge aggregated FSI back into HYBAS polygons
+5. Rasterise HYBAS polygons onto CHIRPS grid
+6. Clean and rescale raster to 0–1
+7. Return CHIRPS‑aligned susceptibility raster
 
-Unlike traditional approaches, CCART‑Floods:
-
-- does **not** interpolate susceptibility  
-- does **not** smooth across hydrological boundaries  
-- does **not** fabricate values in proxy basins  
-
-Instead, CCART uses **direct rasterisation** of empirical values, preserving
-hydrological honesty and avoiding artificial surfaces.
+This produces the **static FSI raster** used by the hazard engine.
 
 ---
 
 ## Inputs
 
-| Input | Type | Description |
-|-------|------|-------------|
-| `gdf_fsi` | GeoDataFrame | from `compute_fsi()` containing FSI_masked|
-| `chirps_transform` | `affine.Affine` | Spatial transform of the CHIRPS grid |
-| `shape` | tuple | `(rows, cols)` of the CHIRPS grid |
+| Input            | Description                                           |
+|------------------|-------------------------------------------------------|
+| `gdf_fsi`          | GeoDataFrame from compute_fsi() with FSI_masked       |
+| `chirps_transform` | Affine transform of CHIRPS 0.05° grid                 |
+| `shape`            | (rows, cols) of CHIRPS grid                           |
+| `hybas_path`       | Path to HydroBASINS L06 polygons                      |
+
+`gdf_fsi` must contain the columns: `FSI_masked`, `geometry`, and `HYBAS_ID` (added during compute_fsi_v1_2).
 
 ---
 
 ## Outputs
 
-| Output | Type | Description |
-|--------|------|-------------|
-| `fsi_rescaled` | 2D `np.ndarray` | Cleaned and min–max rescaled susceptibility raster (0–1, NaN outside empirical basins) |
+| Output        | Description                                              |
+|---------------|----------------------------------------------------------|
+| `fsi_rescaled`  | 2D float32 raster (0–1, NaN outside empirical basins)    |
 
-This raster is passed directly to `export_fsi_raster.py`.
+This raster is:
+
+- CHIRPS‑aligned
+- hydrologically consistent
+- rescaled to 0–1
+- NaN outside India or proxy basins
 
 ---
 
-## Functions in This Module
+## Key Features of This Implementation
 
-### **`rasterise_fsi(gdf_fsi_v1_2, chirps_transform, shape)`**
-Rasterises `FSI_masked` values to the CHIRPS grid using point‑to‑grid
-burning. No interpolation is performed.
+**1. Robust HYBAS Basin ID Detection**
+The module automatically detects the correct basin ID column:
 
-### **`clean_fsi(fsi_raster)`**
-Ensures all values lie within the valid **0–1** range.  
-Anything outside this range becomes `NaN`.
+`HYBAS_ID`, `HYBAS_ID_1`, `HYBAS_ID_12`, `HYBAS_ID_6`, `MAIN_BAS`, `PFAF_ID`
 
-### **`rescale_fsi(fsi_clean)`**
-Min–max rescales valid values to the full **0–1** range.
-Rescaling ensures the susceptibility raster spans the full 0–1 range after rasterisation, preserving contrast across basins.
+This makes the rasteriser dataset‑agnostic and resilient to HYBAS variants.
 
-### **`rasterise_clean_rescale_fsi(...)`**
-Full pipeline wrapper:
+**2. CRS Safety**
 
-1. Rasterise  
-2. Clean  
-3. Rescale  
+If IndoFloods FSI and HYBAS polygons differ in CRS:
 
-Returns the final susceptibility raster.
+```python
+gdf_fsi = gdf_fsi.to_crs(hybas.crs)
+```
+This ensures spatial joins are always correct.
+
+**3. Basin‑wise Aggregation**
+FSI is aggregated per basin:
+
+```python
+mean FSI_masked for all gauges in basin
+```
+This avoids point‑level noise and produces a hydrologically meaningful surface.
+
+**4. Clean Rasterisation**
+Rasterisation uses:
+
+```python
+rasterio.features.rasterize()
+```
+with:
+
+- `NaN` fill
+- `float32` dtype
+- CHIRPS transform
+
+**5. Rescaling to 0–1**
+After rasterisation:
+
+```python
+fsi_rescaled = (fsi_raster - min) / (max - min)
+```
+Only valid pixels are rescaled; NaNs remain untouched.
+
+---
+
+## FSI Raster Characteristics
+
+| Property        | Value / Description                         |
+|-----------------|----------------------------------------------|
+| Grid            | CHIRPS 0.05° grid                            |
+| CRS             | EPSG:4326                                    |
+| Data type       | float32                                      |
+| Value range     | 0–1 (susceptibility)                         |
+| Nodata          | NaN                                          |
+| Method          | Basin‑wise rasterisation                     |
+| Alignment       | Matches CHIRPS transform exactly             |
+
+---
+
+Function Overview
+
+| Function                     | Purpose                                      |
+|------------------------------|----------------------------------------------|
+| `rasterise_clean_rescale_fsi` | Basin‑wise rasterisation + cleaning + scaling |
 
 ---
 
 ## Usage Example
 
 ```python
-from ccart.flood.fsi.compute_fsi import compute_fsi
 from ccart.flood.fsi.rasterise_fsi import rasterise_clean_rescale_fsi
 
 fsi_rescaled = rasterise_clean_rescale_fsi(
-    gdf_fsi = compute_fsi(),
-    chirps_transform=chirps_transform,
-    shape=shape
+    gdf_fsi=gdf_fsi,
+    chirps_transform=transform,
+    shape=(rows, cols),
+    hybas_path="HYBAS_L06.shp"
 )
 ```
+---
+
 ## Notes
 
-- This module performs no interpolation — only rasterisation.
-- Proxy basins remain NaN throughout the pipeline.
-- Cleaning and rescaling ensure numerical stability and reproducibility.
-- The output raster is consumed directly by `export_fsi_raster.py`.
-- All rasters align exactly with the CHIRPS grid (0.05° resolution, EPSG:4326).
+- FSI must already be computed and masked (FSI_masked column).
+- HYBAS L06 is required for hydrologically meaningful basin assignment.
+- This module produces the **canonical static FSI raster** used by:
+    - hazard engine
+    - CCART‑Number
+    - future CMIP6 workflows

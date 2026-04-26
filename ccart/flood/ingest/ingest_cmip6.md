@@ -1,275 +1,159 @@
-# 📘 CCART‑Floods — CMIP6 Ingestion Module
+# CCART‑Floods — CMIP6 Ingestion Module (`ingest_cmip6.py`)
 
-***Multi‑model, scenario‑aware, CHIRPS‑aligned climate forcing engine***
-
----
-
-## 1. Overview
-
-`ingest_cmip6.py` provides a **uniform, reproducible ingestion pipeline** for CMIP6 daily climate variables used in CCART‑Floods.
-It converts raw CMIP6 NetCDF files into **CHIRPS‑aligned, India‑ready daily arrays** for rainfall and temperature.
-
-This module is:
-
-- **multi‑model ready** (ACCESS‑CM2 configured; others can be added via `paths.yaml`)
-- **scenario aware** (ssp126 / ssp245 / ssp370 / ssp585)
-- **grid‑aligned** to the CHIRPS/FSI 0.05° reference grid
-- **unit‑standardized** (mm/day, °C)
-- **region‑consistent** (respects CHIRPS clipping and India mask)
-
-It exposes simple year‑wise loaders for downstream hazard engines (e.g., Rx2day, dynamic flood forcing, heatwave diagnostics).
+**CCART‑Floods Framework (v1.1)**
+**Multi‑model CMIP6 ingestion aligned to CHIRPS/FSI 0.05° grid**
 
 ---
 
-## 2. Scientific Rationale
+## 🌐 Purpose
 
-CCART‑Floods requires **future rainfall and temperature** at the same spatial resolution and grid as CHIRPS, because:
+The CMIP6 ingestion module provides **scenario‑conditioned future rainfall and temperature inputs** for CCART‑Floods. It is:
 
-- flood susceptibility (FSI) is built on CHIRPS
-- exposure alignment uses CHIRPS grid
-- dynamic hazard modules require consistent grids
-- climate uplift factors must be computed on a common baseline
+- **Multi‑model ready** (ACCESS‑CM2 configured; others pluggable)
+- **Scenario‑aware** (e.g., SSP370, SSP585)
+- **Grid‑aligned** to the canonical CHIRPS/FSI 0.05° grid
+- **Config‑driven** (`paths.yaml`)
+- **Unit‑standardized** for hazard engines
 
-CMIP6 models differ in:
+It produces year‑wise arrays of:
 
-- native resolution
-- coordinate orientation
-- land/sea masks
-- temporal coverage
-- variable naming conventions
+- `pr` (mm/day)
+- `tasmax` (°C)
 
-This module standardizes all of them into a **single, reproducible climate forcing format**.
+ready for:
+
+- Dynamic Hazard Engine
+- Future Hazard‑Max Engine
+- CCART Number (future numerator)
 
 ---
 
-## 3. Inputs
+## 📥 Inputs
 
-### 3.1 Required variables
+| Input | Description |
+|-------|-------------|
+| `paths["cmip6"][model][scenario]["pr_dir"]` | Directory containing daily CMIP6 precipitation NetCDFs |
+| `paths["cmip6"][model][scenario]["tasmax_dir"]` | Directory containing daily CMIP6 tasmax NetCDFs |
+| Model name | e.g., `"ACCESS-CM2"` |
+| Scenario | e.g., `"ssp370"`, `"ssp585"` |
+| Year range | Optional `start_year`, `end_year` filters |
+| CHIRPS grid | Obtained from `chirps_ingest` for regridding |
 
-- `pr` — daily precipitation (kg m⁻² s⁻¹)
-- `tasmax` — daily maximum temperature (K)
-
-## 3.2 Directory structure (`paths.yaml`)
-
-```yaml
-cmip6:
-  ACCESS-CM2:
-    ssp370:
-      pr_dir: "D:/CMIP6/ACCESS-CM2/ssp370/pr"
-      tasmax_dir: "D:/CMIP6/ACCESS-CM2/ssp370/tasmax"
-```
-Each directory must contain **one NetCDF per year**, with the year in the filename:
-
-```python
-pr_day_ACCESS-CM2_ssp370_2030.nc
-tasmax_day_ACCESS-CM2_ssp370_2030.nc
-```
 ---
 
-## 4. Outputs
+## 📤 Outputs
 
-The loader returns a dictionary:
+| Output | Description |
+|--------|-------------|
+| `shape` | (ny, nx) of CHIRPS reference grid |
+| `lats`, `lons` | 1D coordinate arrays from CHIRPS grid |
+| `transform`, `crs` | CHIRPS spatial metadata |
+| `pr_files` | DataFrame indexed by year with paths to pr NetCDFs |
+| `tasmax_files` | Same for tasmax |
+| `load_pr_year(path)` | Returns np.ndarray[time, ny, nx] in mm/day |
+| `load_tasmax_year(path)` | Returns np.ndarray[time, ny, nx] in °C |
 
-```python
-{
-  "model": "ACCESS-CM2",
-  "scenario": "ssp370",
-  "shape": (ny, nx),
-  "transform": Affine(...),
-  "crs": CRS(...),
-  "lats": [...],
-  "lons": [...],
-  "pr_files": DataFrame(year → path),
-  "tasmax_files": DataFrame(year → path),
-  "load_pr_year": callable,
-  "load_tasmax_year": callable,
-}
-```
-Each loader returns:
-
-```python
-np.ndarray of shape (time, ny, nx)
-aligned to the CHIRPS/FSI grid.
-```
 ---
 
-## 5. Pipeline Steps
+## 🔬 Methodology
 
-### 5.1 Load CHIRPS reference grid
+### 1. Inventory CMIP6 files
 
-The module imports `load_chirps()` to extract:
-
-- grid shape
-- affine transform
-- CRS
-- lat/lon centers
-
-This ensures **perfect alignment** between:
-
-- CHIRPS
-- FSI
-- CMIP6 rainfall
-- CMIP6 temperature
-
-## 5.2 Inventory CMIP6 files
-
-`_inventory_nc_files()` scans each directory and extracts the year from filenames.
-
-This creates a clean year‑indexed DataFrame:
+**Extract year from filenames**:
 
 ```python
-year | path
-2030 | pr_day_ACCESS-CM2_ssp370_2030.nc
-2031 | ...
+m = re.search(r"(\d{4})", fp.name)
 ```
-### 5.3 Year filtering
-
-`start_year` and `end_year` allow slicing:
+**Build a year‑indexed DataFrame**:
 
 ```python
-load_cmip6(..., start_year=2027, end_year=2100)
+df = pd.DataFrame(records).set_index("year").sort_index()
 ```
-### 5.4 Regridding
 
-Regridding is performed in the model’s native units before conversion to ensure numerical stability.
+### 2. Get CHIRPS reference grid
 
-CMIP6 grids differ by model.
+This ensures perfect alignment with CHIRPS/FSI:
 
-We use:
+```python
+lats, lons, transform, crs = _get_chirps_grid(paths)
+```
+Grid resolution: 0.05° × 0.05°
+
+### 3. Unit conversions
+
+#### Precipitation (pr)
+
+```
+pr_mm_per_day = pr_kg_m2_per_s * 86400
+```
+
+#### Maximum Temperature (tasmax)
+
+```
+tasmax_C = tasmax_K - 273.15
+```
+
+### 4. Regridding to CHIRPS grid
+
+### Linear interpolation:
 
 ```python
 ds[var].interp(lat=lats, lon=lons, method="linear")
 ```
-This ensures:
 
-- monotonic lat ordering
-- CHIRPS‑aligned grid
-- consistent shape for all models
+**Output shape**:
 
-### 5.5 Unit conversion
+```
+(time, ny, nx)
+```
 
-**Rainfall**
+### 5. Year‑wise loaders
 
-CMIP6 `pr` is in kg m⁻² s⁻¹.
-Convert to mm/day:
+**Precipitation**
 
 ```python
-pr_mm_day = pr * 86400
+arr = _load_pr_year(path)
 ```
-**Temperature**
 
-CMIP6 `tasmax` is in Kelvin.
-
-Convert to Celsius:
+**Maximum temperature**
 
 ```python
-tasmax_C = tasmax - 273.15
+arr = _load_tasmax_year(path)
 ```
-### 5.6 Return year‑wise loaders
-
-Two callables:
-
-```python
-load_pr_year(path)     # → (time, y, x)
-load_tasmax_year(path) # → (time, y, x)
-```
-These are used by:
-
-- Rx2day
-- climate uplift
-- dynamic flood forcing
-- heatwave diagnostics
-
-## 6. Configuration Keys
-
-**paths.yaml**
-
-- `cmip6 → model → scenario → pr_dir`
-- `cmip6 → model → scenario → tasmax_dir`
-
-**load_cmip6() arguments**
-
-- `model="ACCESS-CM2"`
-- `scenario="ssp370"`
-- `start_year=2027`
-- `end_year=2100`
-
 ---
 
-## 7. Troubleshooting
+## ▶️ Usage
 
-**❗ No files found**
-
-Check:
-
-- directory paths
-- filename patterns
-- year in filename
-- scenario folder structure
-
-**❗ Variable missing (`pr` not found)**
-
-Some models use different variable names.
-Rename or symlink before ingestion.
-
-**❗ Latitude descending**
-
-Handled automatically by:
-
-```python
-if ds.lat.values[0] > ds.lat.values[-1]:
-    ds = ds.sortby("lat")
-```
-
-**❗ Memory pressure**
-
-Use:
-
-```python
-ds = ds.load()
-ds.close()
-```
-already implemented.
-
-## 8. Performance Notes
-
-- Regridding is the heaviest step (xarray interpolation).
-- ACCESS‑CM2 is relatively coarse → fast.
-- High‑resolution models (e.g., EC‑Earth3) will be slower.
-- Year‑wise loading avoids memory blow‑up.
-- Perfect for overnight runs.
-
----
-
-## 9. Example Usage
+**Import**
 
 ```python
 from ccart.flood.ingest.ingest_cmip6 import load_cmip6
+```
 
+**Load ACCESS‑CM2 SSP370 (2027–2100)**
+
+```python
 cmip = load_cmip6(
     model="ACCESS-CM2",
     scenario="ssp370",
     start_year=2027,
     end_year=2100
 )
+```
 
-# Load rainfall for 2030
+**Load a single year**
+
+```python
 pr_2030 = cmip["load_pr_year"](cmip["pr_files"].loc[2030, "path"])
-
-# Load temperature for 2050
-tas_2050 = cmip["load_tasmax_year"](cmip["tasmax_files"].loc[2050, "path"])
 ```
 ---
 
-## 10. CCART Philosophy
+## ✅ Notes
 
-This module follows CCART’s core principles:
-
-- **transparent**
-- **reproducible**
-- **modular**
-- **scientifically defensible**
-- **India‑ready**
-- **climate‑conditioned**
-
-It converts raw CMIP6 outputs into a **policy‑grade climate forcing engine** for flood and heat hazard modelling.
+- Multi‑model and scenario‑aware ingestion (ACCESS‑CM2 configured)
+- Regrids CMIP6 to the canonical CHIRPS/FSI 0.05° grid
+- Respects CHIRPS clipping (global or region‑clipped)
+- Converts pr and tasmax to CCART‑standard units
+- Provides year‑wise loaders for hazard engines
+- Fully config‑driven (no hardcoded paths)
+- Required by Dynamic Hazard and Future Hazard‑Max engines

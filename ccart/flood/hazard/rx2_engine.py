@@ -114,10 +114,15 @@ def compute_period_max(src_dir, out_path, transform):
         print(f"[PERIOD MAX] No files in {src_dir}")
         return
 
-    arrays = [rasterio.open(f).read(1) for f in files]
+    arrays = []
+    for f in files:
+        with rasterio.open(f) as src:
+            arrays.append(src.read(1).astype("float32"))
+
     period_max = np.max(arrays, axis=0)
     save_tif(out_path, period_max, transform)
     print(f"[PERIOD MAX] → {out_path}")
+
 
 
 # ---------------------------------------------------------

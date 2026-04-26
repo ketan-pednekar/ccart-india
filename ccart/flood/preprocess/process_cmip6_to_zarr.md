@@ -1,90 +1,116 @@
-# 📘 CCART‑Floods — CMIP6 → Zarr Processor (process_cmip6_to_zarr.py)
+# CCART‑Floods — CMIP6 → Zarr Preprocessing (`process_cmip6_to_zarr.py`)
 
-***Append‑by‑time, memory‑safe CMIP6 processing aligned to the CHIRPS/FSI reference grid***
+**Append‑by‑time CMIP6 processor (no preallocation, CHIRPS‑aligned)**
 
-## 1. Purpose
+---
 
-`process_cmip6_to_zarr.py` converts CMIP6 daily climate variables into **continuous, append‑safe Zarr stores** aligned with the CHIRPS/FSI reference grid.
+## 🌐 Purpose
 
-This module:
+This preprocessing script converts **daily CMIP6 precipitation** (`pr`) and **maximum temperature** (`tasmax`) into **continuous Zarr stores**, aligned to the **canonical CHIRPS/FSI 0.05° grid**.
 
-- loads CMIP6 daily precipitation (`pr`) and maximum temperature (`tasmax`)
-- regrids each year to the CHIRPS reference grid (global or clipped)
-- converts units to CCART standards (mm/day, °C)
-- writes each year into a Zarr store using append_dim="time"
-- **never allocates a full (time, lat, lon) array in memory**
+It is designed for:
 
-These Zarr stores form the **future climate forcing backbone** for CCART‑Floods.
+- **Future hazard engines**
+- **Hazard‑max engine**
+- **CCART Number (future numerator)**
+- **Scenario‑conditioned diagnostics**
+- **Model‑agnostic ingestion**
 
-## 2. What This Module Produces
+The processor:
 
-For each model + scenario + variable, the script generates:
+- Loads CMIP6 daily NetCDFs
+- Converts units to CCART standards
+- Regrids to CHIRPS grid
+- Writes **year‑by‑year** into Zarr
+- Never allocates a full (`time`, `lat`, `lon`) array
 
-```python
-<processed_dir>/<model>/<scenario>/<var>.zarr
-```
-Example:
+---
 
-```python
-ccart/outputs/cmip6_processed/ACCESS-CM2/ssp370/pr.zarr
-ccart/outputs/cmip6_processed/ACCESS-CM2/ssp370/tasmax.zarr
-```
-These Zarr cubes are used for:
+## 📥 Inputs
 
-- **Rx2day uplift calculations**
-- **future flood hazard generation**
-- **delta‑hazard workflows**
-- **exposure conditioning**
-- **heatwave diagnostics**
-- **model‑scenario comparisons**
+| Input | Description |
+|-------|-------------|
+| CMIP6 daily NetCDFs | `pr` and `tasmax` files for each year |
+| `paths.yaml` | Provides CMIP6 root directories and processed output paths |
+| `load_cmip6()` | Supplies file inventory, grid, CRS, and year‑wise loaders |
+| Flood parameters (`future.start`, `future.end`) | Defines year range for processing |
+| CHIRPS reference grid | Used for regridding CMIP6 to 0.05° |
 
-## 3. What This Module Does
+Supported variables:
 
-### 3.1 Loads CMIP6 metadata and grid
+- `pr` — precipitation
+- `tasmax` — daily maximum temperature
 
-The script calls:
+---
 
-```python
-cmip = load_cmip6(model, scenario, start_year, end_year)
-```
-This provides:
+## 📤 Outputs
 
-- `pr_files`, `tasmax_files` — year‑indexed file inventories
-- `load_pr_year`, `load_tasmax_year` — year‑wise loaders
-- `lats`, `lons` — CHIRPS‑aligned grid
-- `shape` — (ny, nx)
-- `crs` — always `EPSG:4326`
+| Output | Description |
+|--------|-------------|
+| `.../cmip6_processed/<model>/<scenario>/pr.zarr` | Daily precipitation (mm/day) |
+| `.../cmip6_processed/<model>/<scenario>/tasmax.zarr` | Daily maximum temperature (°C) |
+| Coordinates | `time`, `lat`, `lon` |
+| Grid | CHIRPS/FSI canonical 0.05° grid |
+| Metadata | Model, scenario, CRS, units, long_name |
+| Time span | Determined by `future.start` → `future.end` |
 
-The CMIP6 data is **already regridded** to CHIRPS resolution by `ingest_cmip6.py`.
+Each Zarr store is:
 
-### 3.2 Processes one variable at a time
+- **Append‑safe** (`append_dim="time"`)
+- **Chunked by year**
+- **Float32**
 
-For each variable (`pr`, `tasmax`):
+---
 
-- selects the correct loader
-- applies unit conversion
-- loads one year at a time
-- constructs a daily time coordinate
-- builds a clean xarray Dataset
+## 🔬 Methodology
 
-This ensures **low memory usage** and **clean separation** of variables.
-
-## 3.3 Builds a clean xarray Dataset per year
-
-Each year becomes:
+### 1. Load CMIP6 ingestion metadata
 
 ```python
-Dataset({
-    var: (("time", "lat", "lon"), arr)
-})
+cmip = load_cmip6(model=model, scenario=scenario,
+                  start_year=start_year, end_year=end_year)
+```
+Provides:
+
+- Year‑indexed file lists
+- Year‑wise loaders
+- CHIRPS‑aligned grid
+- CRS and metadata
+
+### 2. Select variable configuration
+
+```python
+if var == "pr":
+    units = "mm/day"
+    long_name = "Daily precipitation"
+elif var == "tasmax":
+    units = "degC"
+    long_name = "Daily maximum temperature"
 ```
 
-with coordinates:
+### 3. Loop year‑wise and load daily arrays
 
-- `time` — daily timestamps
-- `lat`, `lon` — CHIRPS grid centers
+```python
+arr = loader(fp)   # (time, ny, nx)
+```
+- Already regridded to CHIRPS
+- Already unit‑converted
+- Already clipped (if configured)
 
-and metadata:
+### 4. Build time coordinate
+
+```python
+time = pd.date_range(f"{yr}-01-01", periods=tlen, freq="D")
+```
+### 5. Construct Xarray Dataset
+
+```python
+ds_year = xr.Dataset(
+    {var: (("time", "lat", "lon"), arr.astype("float32"))},
+    coords={"time": time, "lat": lats, "lon": lons},
+)
+```
+Metadata added:
 
 - model
 - scenario
@@ -92,103 +118,62 @@ and metadata:
 - units
 - long_name
 
-All arrays are stored as `float32` for efficiency.
-
-Each year is chunked along the time dimension to optimize sequential reads during hazard computation.
-
-### 3.4 Writes to Zarr (append‑safe)
-
-The first year is written with:
+### 6. Write to Zarr (append‑by‑time)
 
 ```python
-mode="w"
+ds_year.to_zarr(out_path, mode="a", append_dim="time")
 ```
-Subsequent years are appended with:
-
-```python
-mode="a", append_dim="time"
-```
-This produces a **continuous, multi‑decadal climate forcing cube** without ever holding the full dataset in memory.
+- First year uses `mode="w"`
+- Subsequent years append along `time`
 
 ---
 
-**4. Output Structure**
+## 📐 Unit Conversions (Markdown‑Ready)
 
-Each Zarr store contains:
+These conversions are applied inside `ingest_cmip6.py`, not in this script — but they are included here for documentation completeness.
 
-```python
-<var>.zarr/
-    <var>/        # daily values (mm/day or °C)
-    time/         # daily timestamps
-    lat/          # CHIRPS latitude centers
-    lon/          # CHIRPS longitude centers
-    .zmetadata    # consolidated metadata
+
+### Precipitation (pr)
+
+```
+pr_mm_per_day = pr_kg_m2_per_s * 86400
 ```
 
-All arrays are:
+### Maximum Temperature (tasmax)
 
-- `float32`
-- CHIRPS‑aligned
-- model‑ and scenario‑specific
-- time‑continuous
+```
+tasmax_C = tasmax_K - 273.15
+```
 
 ---
 
-## 5. Usage
+## ▶️ Usage
 
-**Command‑line**
+### Run preprocessing
 
 ```bash
-python ccart/flood/preprocess/process_cmip6_to_zarr.py
+python process_cmip6_to_zarr.py
 ```
 
-**Inside Python**
+### Output directory structure
 
-```python
-from ccart.flood.preprocess.process_cmip6_to_zarr import process_variable_to_zarr
-
-process_variable_to_zarr("ACCESS-CM2", "ssp370", "pr")
-process_variable_to_zarr("ACCESS-CM2", "ssp370", "tasmax")
 ```
-
-The `main()` function processes:
-
-- model: `ACCESS‑CM2`
-- scenarios: `ssp370`, `ssp585`
-- variables: `pr`, `tasmax`
+cmip6_processed/
+    ACCESS-CM2/
+        ssp370/
+            pr.zarr/
+            tasmax.zarr/
+        ssp585/
+            pr.zarr/
+            tasmax.zarr/
+```
 
 ---
 
-## 6. Notes & Design Choices
+## 🧭 Notes
 
-- **Append‑by‑time**  
-    Avoids allocating large arrays; ideal for multi‑decadal CMIP6 datasets.
-- **Year‑wise loading**  
-    Prevents memory blow‑up and allows overnight processing.
-- **CHIRPS‑aligned grid**  
-    Ensures perfect compatibility with CHIRPS, FSI, and hazard modules.
-- **Unit conversions**
-    - `pr`: kg m⁻² s⁻¹ → mm/day
-    - `tasmax`: K → °C
-- **Chunking**  
-    Each year is chunked along time for fast sequential reads.
-- **CRS is always EPSG:4326**  
-    CMIP6 is regridded to CHIRPS’ geographic coordinate system.
-- **No resampling here**  
-    All regridding is handled upstream in ingest_cmip6.py.
+- No full (`time`, `lat`, `lon`) array is ever allocated
+- Perfectly aligned with CHIRPS grid
+- Fully config‑driven (no hardcoded paths)
+- Supports multi‑model, multi‑scenario workflows
 
----
-
-## 7. Why This Matters
-
-These Zarr cubes are the **future climate engine** of CCART‑Floods.
-
-Every future hazard calculation — rainfall uplift, dynamic flood forcing, heatwave diagnostics, delta‑hazard maps — depends on these datasets being:
-
-- clean
-- continuous
-- reproducible
-- grid‑aligned
-- scientifically defensible
-
-This script ensures that CCART’s CMIP6 processing is **transparent, modular, and policy‑grade**.

@@ -1,190 +1,252 @@
-# README — CCART‑Floods FSI Pipeline
+# CCART‑Floods — Flood Susceptibility Index (FSI) Subsystem
 
-## Overview
+**The Flood Susceptibility Index (FSI)** is the static component of the CCART‑Floods hazard model.
+It represents the **intrinsic flood‑proneness** of each basin in India, independent of rainfall.
 
-The CCART‑Floods FSI pipeline converts gauge‑based Flood Susceptibility Index (FSI) values into a **CHIRPS‑aligned, float32, NaN‑aware GeoTIFF** suitable for hazard multiplication and downstream risk modelling.
+FSI is computed at IndoFloods gauge locations (v1.1 + v1.2), masked for ungauged basins, rasterised to the CHIRPS grid, and exported as a canonical GeoTIFF used by the hazard engine.
 
-This pipeline is fully modular:
+---
 
-```python
-compute_fsi.py  →  rasterise_fsi.py  →  export_fsi_raster.py
-```
-and is orchestrated by:
+## 🌐 FSI Architecture Overview
 
 ```python
+compute_fsi.py
+    ├── FSI v1.1 (geomorphology + soils + climate)
+    ├── FSI v1.2 (hydrology + proxy masking)
+    └── FSI_masked (final gauge-level susceptibility)
+
+rasterise_fsi.py
+    └── Basin-wise rasterisation → CHIRPS grid → rescale 0–1
+
+export_fsi_raster.py
+    └── Write canonical GeoTIFF (float32, NaN nodata, LZW)
+
 run_fsi_pipeline.py
+    └── Orchestrates the entire static FSI workflow
 ```
-All paths are loaded from `paths.yaml` to ensure portability and reproducibility.
 
 ---
 
-## Purpose
+## Final output:
 
-The pipeline produces the canonical CCART‑Floods susceptibility layer:
+`ccart_floods_fsi_static_chirps_rescaled.tif`
+
+---
+
+## 📘 1. FSI v1.1 — Empirical IndoFloods Susceptibility
+
+### Inputs
+
+| File                                   | Description                          |
+|----------------------------------------|--------------------------------------|
+| `catchment_characteristics_indofloods.csv` | IndoFloods geomorphology + soils     |
+| `metadata_indofloods.csv`                | Gauge metadata                       |
+
+
+### Variables Used
+
+| Variable             | Why It Matters                                   |
+|----------------------|--------------------------------------------------|
+| Drainage Density     | Controls runoff concentration                    |
+| Catchment Relief     | Steeper basins → flashier floods                |
+| Ruggedness Number    | Terrain complexity                               |
+| Elongation Ratio     | Basin shape → hydrograph response                |
+| Form Factor          | Width/length ratio                               |
+| Annual Precipitation | Climatic forcing                                 |
+| Soil Type            | Infiltration/runoff behaviour                    |
+
+All numeric variables are **min–max normalised**.
+Soils are **one‑hot encoded** and averaged into `Soil_block`.
+
+### FSI v1.1 formula
 
 ```python
-ccart_floods_fsi_rescaled.tif
+FSI_v1_1 = mean([
+    DrainageDensity_norm,
+    CatchmentRelief_norm,
+    Ruggedness_norm,
+    Elongation_norm,
+    FormFactor_norm,
+    AnnualPrecip_norm,
+    Soil_block
+])
 ```
-This raster:
-
-- aligns exactly with the CHIRPS grid
-- uses float32 with NaN nodata
-- is rescaled to 0–1
-- is masked to empirical flood basins
-- is ready for hazard multiplication (FSI × rainfall anomaly)
+Output: **GeoDataFrame** with point geometry (EPSG:4326).
 
 ---
 
-## Pipeline Steps
+## 📘 2. FSI v1.2 — Hydrology‑Enhanced Susceptibility
 
-1. Compute FSI (`compute_fsi.py`)
-Generates a unified GeoDataFrame of gauge‑based FSI values, masked to empirical flood basins.
+### Inputs
 
-2. Rasterise + Clean + Rescale (`rasterise_fsi.py`)
-Converts point‑based FSI into a CHIRPS‑aligned raster:
+| File              | Description                     |
+|-------------------|---------------------------------|
+| HYBAS_SHP         | HydroBASINS L06 polygons        |
+| INDIA_SHP         | India boundary                  |
+| Output of FSI v1.1| Gauge‑level susceptibility      |
 
-- rasterisation
-- NaN cleaning
-- empirical masking
-- 0–1 rescaling
 
-3. Export GeoTIFF (`export_fsi_raster.py`)
 
-Writes the final susceptibility raster:
+### Hydrological Variables
 
-- float32
-- NaN nodata
-- CHIRPS transform
-- LZW compression
-- tiled GeoTIFF
+| Variable  | Meaning                                | Why It Matters                                  |
+|-----------|-----------------------------------------|--------------------------------------------------|
+| UP_AREA   | Total upstream contributing area        | Larger upstream → more inflow → higher risk     |
+| SUB_AREA  | Area of the basin polygon               | Basin size context                               |
+| ORDER     | Strahler stream order                   | Maturity of river network                        |
+| n_gauges  | Number of IndoFloods gauges in basin    | Indicates empirical support                      |
+| Proxy_flag| 1 = no gauges, 0 = has gauges           | Used to mask ungauged basins                    |
+
+### Steps
+
+1. Filter HYBAS to India
+2. Count gauges per basin → identify proxy basins
+3. Assign hydrological attributes
+4. Normalise hydrological variables
+5. Compute FSI v1.2
+6. Apply proxy mask
+
+### FSI v1.2 formula
+
+```python
+FSI_v1_2 = 0.5 * FSI_v1_1 + 0.5 * UP_AREA_norm
+```
+
+### Proxy Mask
+
+```python
+FSI_masked = NaN if Proxy_flag == 1 else FSI_v1_2
+```
+
+### Final Output Columns
+
+| Column       | Meaning                                                |
+|--------------|--------------------------------------------------------|
+| FSI_v1_1     | Empirical susceptibility                               |
+| FSI_v1_2     | Hydrology‑enhanced susceptibility                      |
+| FSI_masked   | Final recommended FSI (NaN for proxy basins)           |
+| HYBAS_ID     | HydroBASINS Level‑06 basin ID                          |
+| Proxy_flag   | 1 = ungauged basin                                     |
+| geometry     | Point geometry                                         |
 
 ---
 
-## Inputs
+## 📘 3. Basin‑Wise Rasterisation (`rasterise_fsi.py`)
 
-| Input Name        | Description                                      | Source / Path Key                     |
-|-------------------|--------------------------------------------------|----------------------------------------|
-| FSI gauges        | Gauge-level susceptibility values                | compute_fsi.py                         |
-| HYBAS basins      | Level-06 hydrological basins for masking         | paths.yaml → data.hybas                |
-| India boundary    | Optional administrative mask                     | paths.yaml → data.india_boundary       |
-| CHIRPS template   | Provides grid, transform, CRS for rasterisation  | paths.yaml → chirps.template           |
+### Pipeline
 
----
+- Load HYBAS L06 polygons
+- Spatial join gauges → basins
+- Aggregate FSI per basin
+- Merge into HYBAS polygons
+- Rasterise polygons to CHIRPS grid
+- Rescale raster to 0–1
 
-## Outputs
+### Key Features
 
-| Output File                        | Description                                      | Location (paths.yaml)          |
-|------------------------------------|--------------------------------------------------|--------------------------------|
-| `ccart_floods_fsi_rescaled.tif`      | Final CHIRPS-aligned susceptibility raster       | outputs.fsi                    |
-| Console logs                       | Step-by-step pipeline progress                   | stdout                         |
-| Intermediate arrays                | In-memory only                                   | not written                    |
+| Feature               | Description                                      |
+|-----------------------|--------------------------------------------------|
+| HYBAS ID detection    | Automatically detects correct basin ID column    |
+| CRS safety            | Auto‑aligns CRS between gauges and HYBAS         |
+| Basin‑wise assignment | Hydrologically meaningful susceptibility surface |
+| NaN masking           | Proxy basins remain NaN                          |
+| CHIRPS alignment      | Exact match to CHIRPS 0.05° grid                 |
 
----
 
-## Module Responsibilities
+### Output
 
-| Module                  | Responsibility                                 | Output Type            |
-|-------------------------|-------------------------------------------------|------------------------|
-| `compute_fsi.py`          | Load + unify gauge FSI                          | GeoDataFrame           |
-| `rasterise_fsi.py`        | Rasterise + clean + rescale FSI                 | 2D float32 NumPy array |
-| `export_fsi_raster.py`    | Write CHIRPS-aligned GeoTIFF                    | GeoTIFF file           |
-| `run_fsi_pipeline.py`     | Orchestrate full pipeline (config-driven)       | Final raster           |
+| Output       | Description                                   |
+|--------------|-----------------------------------------------|
+| fsi_rescaled | 2D float32 raster (0–1, NaN outside India)    |
 
 ---
 
-## Execution
+## 📘 4. Exporter (`export_fsi_raster.py`)
 
-Run the pipeline from project root:
+### Output Raster Characteristics
+
+| Property        | Value / Description                         |
+|-----------------|----------------------------------------------|
+| Grid            | CHIRPS 0.05° grid                            |
+| CRS             | EPSG:4326                                    |
+| Data type       | float32                                      |
+| Value range     | 0–1 (susceptibility)                         |
+| Nodata          | NaN                                          |
+| Compression     | LZW                                          |
+| Alignment       | Matches CHIRPS transform exactly             |
+
+This module **does not modify values** — it only writes the raster.
+
+---
+
+## 📘 5. Pipeline Runner (run_fsi_pipeline.py)
+
+1. Runs the entire FSI workflow:
+2. Load CHIRPS grid metadata
+3. Compute FSI (v1.1 + v1.2 + masking)
+4. Rasterise to CHIRPS
+5. Rescale
+6. Export GeoTIFF
+
+### Output
+
+`ccart_floods_fsi_static_chirps_rescaled.tif`
+
+---
+
+## ▶️ How to Run the FSI Pipeline
+
+Because CCART‑Floods uses an **orchestrator**, you only need one command.
+
+### Option 1 — Run from terminal
 
 ```bash
-python -m ccart.flood.fsi.run_fsi_pipeline
+python run_fsi_pipeline.py
 ```
-The script automatically:
-
-- loads `paths.yaml`
-- loads CHIRPS grid metadata
-- computes FSI
-- rasterises
-- exports GeoTIFF
-
-No hardcoded paths are used.
-
----
-
-## Dependencies
-
-The FSI pipeline requires the following Python packages:
-
-| Package     | Purpose                                |
-|-------------|------------------------------------------|
-| rasterio    | Reading/writing GeoTIFFs, CHIRPS grid    |
-| geopandas   | Handling gauge shapefiles and HYBAS      |
-| numpy       | Array operations                         |
-| shapely     | Geometry operations                      |
-| pyproj      | CRS handling                             |
-
-These are already part of the CCART environment specification.
-
----
-
-## Configuration (`paths.yaml`)
-
-The pipeline expects:
-
-```yaml
-project_root: "C:/CMIP_data/cmip6/Climada/Projects/ccart-india"
-
-chirps:
-  daily_dir: "D:/Climate Risk Data/CHIRPS_daily"
-  template: "D:/Climate Risk Data/CHIRPS_daily/chirps_2020_01.tif"
-
-outputs:
-  fsi: "ccart/flood/outputs/fsi"
-```
----
-
-## File Structure
+### Option 2 — Run from Python
 
 ```python
-ccart/
-  flood/
-    fsi/
-      compute_fsi.py
-      rasterise_fsi.py
-      export_fsi_raster.py
-      run_fsi_pipeline.py
-      README.md   ← this file
+from ccart.flood.fsi.run_fsi_pipeline import main
+main()
 ```
----
+**No manual sequencing required**
 
-## Diagnostics
+The orchestrator automatically:
 
-| Check                     | Expected Value / Behaviour                   | Notes                                  |
-|---------------------------|-----------------------------------------------|----------------------------------------|
-| CHIRPS grid shape         | Matches template raster                       | Printed at pipeline start              |
-| FSI gauge count           | > 0                                           | Printed after compute_fsi()            |
-| Output dtype              | float32                                       | Enforced in export_fsi_raster.py       |
-| Output nodata             | NaN                                           | Enforced                               |
-| Output CRS                | EPSG:4326                                     | Inherited from CHIRPS template         |
-| Output compression        | LZW                                           | Set in export_fsi_raster.py            |
-| Output tiling             | Yes                                           | Set in export_fsi_raster.py            |
+- loads CHIRPS metadata
+- computes FSI v1.1 + v1.2
+- applies proxy masking
+- rasterises to CHIRPS
+- rescales
+- exports the GeoTIFF
 
----
-
-## Troubleshooting
-
-| Issue                          | Cause                                      | Fix                                           |
-|--------------------------------|---------------------------------------------|-----------------------------------------------|
-| Output raster is empty         | CHIRPS template path incorrect              | Check `paths.yaml → chirps.template`          |
-| FSI gauges = 0                 | INDOFLOODS path incorrect                   | Check `paths.yaml → data.indofloods`          |
-| CRS mismatch warning           | Template not EPSG:4326                      | Use any CHIRPS file as template               |
-| Raster looks all zeros         | Rescaling step received only NaNs           | Check HYBAS mask and gauge coverage           |
-| Pipeline crashes on rasterise  | CHIRPS template unreadable or corrupted     | Replace template with any valid CHIRPS file   |
+You never need to call the submodules individually unless debugging.
 
 ---
 
-## Notes
+## 🔄 Differences From Earlier FSI Versions
 
-- This pipeline produces the **canonical susceptibility layer** for CCART‑Floods.
-- All downstream hazard modules assume this raster exists and is CHIRPS‑aligned.
-- The pipeline is intentionally simple and transparent to maintain scientific defensibility.
+| Area | Earlier System | New Canonical System |
+|------|----------------|----------------------|
+| Architecture | Scattered scripts | Clean 3‑module design |
+| FSI v1.1 | Inconsistent | Standardised + audited |
+| Hydrology | Not included | Added via HYBAS L06 |
+| Proxy basins | Not masked | Explicit NaN masking |
+| Rasterisation | Point burn‑in | Basin‑wise polygons |
+| HYBAS handling | Manual | Automatic ID detection |
+| CRS | Sometimes mismatched | Auto‑aligned |
+| Output | Inconsistent | Canonical CHIRPS GeoTIFF |
+| Dead code | Present | Removed |
+
+
+## 🧭 Notes
+
+- FSI is static — it does not depend on rainfall.
+- Hazard is computed later as:
+  ```python
+  Hazard = FSI × Rainfall Anomaly
+  ```
+FSI is required for:
+  - hazard engine
+  - CCART‑Number
+  - CMIP6 workflows

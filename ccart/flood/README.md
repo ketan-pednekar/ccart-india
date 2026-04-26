@@ -1,364 +1,306 @@
-# CCART‑Floods — Module‑Level README (beta - being updated)
+# CCART‑Floods — Canonical Flood Hazard Framework for India (v1.1)
 
-***A modular, reproducible, climate‑conditioned flood hazard engine for India***
+**Featuring the CCART Number — A New Metric for Scenario‑Conditioned Flood Hazard Change**
 
-***Climate-conditioned flood hazard module — CHIRPS daily Rx2day baseline (1995–2024), FSI v1.2 (INDOFLOODS + HydroBASINS), CMIP6 SSP3-7.0 and SSP5-8.5 projections to 2100.***
-
----
-
-## 🌧️ Overview
-
-**CCART‑Floods** is a fully modular, open‑source flood hazard modelling framework.
-
-It integrates:
-
-- CHIRPS rainfall extremes
-- CMIP6 climate projections
-- FSI (Flood Susceptibility Index)
-- A transparent hazard formulation
-
-to produce **climate‑conditioned flood hazard** for both historical and future periods.
-
-The system is designed to be:
-
-- **Scientifically transparent** — explicit formulas, assumptions, and data sources
-- **Modular** — ingestion, metrics, susceptibility, and hazard are cleanly separated
-- **Reproducible** — deterministic outputs, no hidden steps
-- **Memory‑safe** — processes multi‑decadal data one year at a time
-- **CHIRPS‑aligned** — all rasters share the same grid, CRS, and resolution
-
-CCART‑Floods is built as a research‑grade engine, not a dashboard.
+*CCART‑Floods v1.1 is a frequency‑based flood hazard engine for India, producing historical hazard, future hazard, hazard‑max layers, and the CCART Number.*
 
 ---
 
-## Known FSI Limitations
+## ⭐ CCART Number — The Headline Contribution
 
-### INDOFLOODS Public Dataset Coverage
-The public INDOFLOODS dataset (Zenodo) contains 155 gauges. 
+The CCART Number is the central scientific contribution of CCART‑Floods.
+It quantifies how much flood hazard increases (or decreases) under future climate scenarios relative to historical conditions.
 
-Coverage is severely limited in:
-
-| State | Coverage | Reason |
-|-------|----------|--------|
-| Bihar | 0.3% | Only 3 Ganga basin gauges |
-| Uttarakhand | 0.0% | No gauges |
-| Punjab | 0.0% | No gauges |
-| Haryana | 0.0% | No gauges |
-| UP | 5.2% | Sparse coverage |
-
-Complete INDOFLOODS data including Ganga and Brahmaputra basins is available on request from the authors. FSI v2.0 will incorporate this data when available.
-
-These limitations do not affect the reproducibility of the pipeline; they only constrain the spatial completeness of susceptibility.
-
-## 🧱 Architecture Overview
-
-CCART‑Floods consists of **three scientific subsystems**, each independently modular:
-
-```python
-CHIRPS Subsystem → Rainfall Metrics (Rx2day, P95)
-FSI Subsystem    → Structural Susceptibility (FSI v1.2)
-Hazard Subsystem → Climate‑Conditioned Flood Hazard
 ```
-Each subsystem has its own ingestion, processing, utilities, and documentation.
-
----
-
-## 📦 Subsystems
-
-**1. CHIRPS Subsystem — Rainfall Ingestion & Metrics**
-
-**Purpose**
-
-Transforms raw CHIRPS daily rainfall into extreme‑rainfall metrics used by the hazard engine.
-
-**Components**
-
-| File                | Purpose                                                       |
-|---------------------|----------------------------------------------------------------|
-| `ingest_chirps.py`  | Inventory, load, clip, and clean CHIRPS daily rainfall        |
-| `compute_metrics.py`| Compute Rx2day (annual max 2‑day rainfall) and P95 baseline   |
-| `raster_utils.py`   | Reprojection, masking, alignment utilities                    |
-| `*.md`              | Documentation for each module                                 |
-
-**Outputs**
-
-- `rx2day_YYYY.npy` — annual maximum 2‑day rainfall
-- `p95_rx2day.npy` — 95th percentile baseline (1995–2024)
-- CHIRPS metadata (shape, transform, CRS, India boundary)
-
-**Scientific Notes**
-
-- CHIRPS defines the **master grid** for the entire flood module
-- All computations are **memory‑safe** (one year at a time)
-- P95 provides the **baseline extreme rainfall threshold**
-
-
-**2. FSI Subsystem — Flood Susceptibility Index**
-
-**Purpose**
-
-Transforms INDOFLOODS geomorphology + HydroBASINS hydrology into a national‑scale susceptibility raster aligned with CHIRPS.
-
-**Components**
-
-| File                     | Purpose                                                             |
-|--------------------------|----------------------------------------------------------------------|
-| `build_fsi_v1_1.py`      | Compute FSI v1.1 from geomorphology + soils                         |
-| `build_fsi_v1_2.py`      | Enhance FSI v1.1 using HydroBASINS hydrological structure           |
-| `rasterise_fsi.py`       | Rasterise, clean, and rescale FSI v1.2 to CHIRPS grid               |
-| `export_fsi_raster.py`   | Export final FSI raster to GeoTIFF with correct metadata            |
-| `utils_fsi.py`           | Normalisation, soil encoding, spatial joins, raster masking         |
-| `*.md`                   | Documentation for each module                                       |
-
-**Scientific Notes**
-
-- **FSI v1.1** — empirical susceptibility (terrain + soils)
-- **FSI v1.2** — adds hydrological structure (UP_AREA, SUB_AREA, ORDER)
-- Proxy basins (no gauges) are masked to **NaN**
-- Rasterisation uses no **interpolation**
-- Final FSI raster is 0–1, CHIRPS‑aligned, float32
-- All loops are resume‑friendly — missing years can be recomputed without rerunning the full pipeline.
-
-**3. Hazard Subsystem — Climate‑Conditioned Flood Hazard**
-
-**Purpose**
-
-Combines rainfall extremes with susceptibility to compute flood hazard for historical and future periods.
-
-**Hazard Formula**
-
-\[
-H = \text{FSI} \times \max\left(\frac{\text{Rx2day}}{\text{P95}}, 0\right)
-\]
-
-This expresses how rainfall extremes amplify underlying terrain‑driven susceptibility.
-
-**Components**
-
-| File                 | Purpose                                                             |
-|----------------------|----------------------------------------------------------------------|
-| `ingest_fsi.py`      | Load + reproject FSI raster to CHIRPS grid                          |
-| `hazard_engine.py`   | Core hazard computation + historical + future loops                 |
-| `hazard_utils.py`    | Shared helper functions (safe division, clipping, normalisation)    |
-| `*.md`               | Documentation for each module                                       |
-
-**Outputs**
-
-- `hazard_hist_YYYY.npy` — historical hazard (1995–2024)
-- `hazard_fut_YYYY.npy` — future hazard (2027–2100, CMIP6 SSP3‑7.0)
-
-**Scientific Notes**
-
-- Hazard is **pixel‑wise** and fully CHIRPS‑aligned
-- CMIP6 rainfall is reprojected to CHIRPS using bilinear resampling
-- All loops are resume‑friendly and memory‑safe
-
----
-
-## 🚀 Full Pipeline Orchestration
-
-A complete end‑to‑end workflow is provided in:
-
-```python
-ccart/flood/example/run_flood_pipeline.py
+CCART_Number = H_max_future / H_max_historical
 ```
-This script runs the entire CCART‑Floods pipeline:
+Where:
 
-- CHIRPS ingestion + Rx2day + P95
-- FSI v1.1 + FSI v1.2
-- FSI rasterisation + export
-- Historical + future hazard computation
+- `H_max_historical` = worst flood‑hazard year in 1995–2024  
+- `H_max_future` = worst flood‑hazard year in 2027–2100 (scenario‑conditioned)
 
 
-## 🔄 End‑to‑End Workflow
+### Interpretation
 
-```python
-1. CHIRPS ingestion
-2. Compute Rx2day for all years
-3. Compute P95 baseline
-4. Build FSI v1.1 (geomorphology + soils)
-5. Build FSI v1.2 (add hydrology + mask proxies)
-6. Rasterise + clean + rescale FSI
-7. Export final FSI raster
-8. Ingest FSI for hazard engine
-9. Compute historical hazard (1995–2024)
-10. Compute future hazard (2027–2100)
+| CCART Number | Meaning |
+|--------------|---------|
+| < 1 | Future hazard lower than historical |
+| = 1 | No change |
+| 1–3 | Moderate increase |
+| 3–10 | Strong increase |
+| > 10 | Extreme increase |
+| capped at 50 | Outlier protection |
+
+
+### Outputs
+
+- `ccart_number_ssp370.tif`
+- `ccart_number_ssp585.tif`
+
+The CCART Number is:
+
+- **frequency‑based**
+- **scenario‑conditioned**
+- **FSI‑weighted**
+- **CHIRPS‑aligned**
+- **interpretable**
+- **scientifically stable**
+
+It is the **unifying metric** of the entire CCART‑Floods platform.
+
+---
+
+## 🌐 What is CCART‑Floods?
+
+CCART‑Floods is a **canonical, frequency‑based flood hazard modelling system for India**, built on:
+
+- **CHIRPS rainfall** (historical)
+- **CMIP6 rainfall** (future, CHIRPS‑aligned)
+- **IndoFloods‑derived Flood Susceptibility Index (FSI)**
+- **A fully modular hazard pipeline**
+
+It produces:
+
+- Historical hazard (1995–2024)
+- Future hazard (2027–2100)
+- Hazard‑Max layers
+- CCART Number (flagship metric)
+
+---
+
+## 🧠 Why Frequency‑Based Hazard?
+
+Earlier CCART prototypes used intensity‑based hazard:
+
+### Earlier CCART Prototype (Intensity‑Based Hazard)
+
+```
+H = FSI * max( Rx2day / P95 , 0 )
+```
+This produced unstable patterns and sensitivity to single events.
+
+CCART‑Floods v1.1 introduces a **frequency‑based hazard**:
+
+### CCART‑Floods v1.1 (Frequency‑Based Hazard)
+
+```
+H_y = N_exceed_y * FSI_uplift
+```
+Where:
+
+- `N_exceed_y` = number of 2‑day rainfall events exceeding P95  
+- `FSI_uplift` = scenario‑conditioned susceptibility
+
+
+### Why this matters
+
+| Aspect | Old Method (Intensity) | New Method (Frequency) |
+|--------|--------------------------|--------------------------|
+| Stability | Sensitive to single events | Stable across years |
+| Interpretation | Hard to explain | Intuitive (“how often do extremes occur?”) |
+| Hydrological realism | Mixed magnitude + susceptibility | Clean frequency × susceptibility |
+| Scenario consistency | Weak | Strong |
+| CCART Number | Unstable | Canonical |
+
+This shift is the **core scientific upgrade** of CCART‑Floods v1.1. Due to change in methodology, CCART Flood 1.0 and CCART Flood 1.1 results are not comparable. 
+
+---
+
+## 🧩 CCART‑Floods Architecture
+
+`CHIRPS → P95 → Rx2 → FSI → Hazard → Hazard‑Max → CCART Number`
+
+A modular, reproducible pipeline:
+
+### 1. Ingestion Subsystem
+
+    - CHIRPS rasters → Zarr
+    - CMIP6 NetCDF → CHIRPS‑aligned Zarr
+    - Standardized units (mm/day, °C)
+
+### 2. FSI Subsystem
+
+    - IndoFloods geomorphology + hydrology
+    - HYBAS L06 basin‑wise rasterisation
+    - Static susceptibility surface (0–1)
+
+### 3. P95 Engine
+    - 95th percentile of 2‑day rainfall (CHIRPS)
+
+
+### 4. Rx2 Engine
+
+    - Annual Rx2max (CHIRPS + CMIP6)
+    - Scenario‑max Rx2max (2027–2100)
+
+### 5. FSI Uplift Engine — Scenario‑Conditioned Susceptibility
+
+```
+FSI_uplift = FSI * (Rx2max_future / P95)
 ```
 
-Each stage is modular, documented, and reproducible.
+### 6. Hazard Engines
 
-## 📁 Directory Structure
+    - Historical hazard (1995–2024)
+    - Future hazard (2027–2100)
+    - Frequency‑based exceedance counts
 
-```python
-ccart/flood/
-│
-├── README.md                 # Module‑level documentation (this file)
-├── __init__.py               # Flood module namespace
-│
-├── chirps/                   # CHIRPS ingestion + rainfall metrics
-│   ├── ingest_chirps.py
-│   ├── compute_metrics.py
-│   ├── raster_utils.py
-│   ├── ingest_chirps.md
-│   ├── compute_metrics.md
-│   ├── raster_utils.md
-│   └── __pycache__/
-│
-├── fsi/                      # Flood Susceptibility Index subsystem
-│   ├── build_fsi_v1_1.py
-│   ├── build_fsi_v1_2.py
-│   ├── rasterise_fsi.py
-│   ├── export_fsi_raster.py
-│   ├── utils_fsi.py
-│   ├── build_fsi_v1_1.md
-│   ├── build_fsi_v1_2.md
-│   ├── rasterise_fsi.md
-│   ├── export_fsi_raster.md
-│   ├── utils_fsi.md
-│   └── __pycache__/
-│
-├── hazard/                   # Hazard computation subsystem
-│   ├── ingest_fsi.py
-│   ├── hazard_engine.py
-│   ├── hazard_utils.py
-│   ├── ingest_fsi.md
-│   ├── hazard_engine.md
-│   ├── hazard_utils.md
-│   └── __pycache__/
-│
-├── outputs/                  # Generated outputs (Rx2day, P95, FSI raster, hazard)
-│
-├── example/                  # Quickstart scripts, demo notebooks (to be added)
-│
-├── config.py                 # Paths + constants
-└── config.md                 # Documentation for config
-```
+### 7. Hazard‑Max Engines
+
+    - Worst‑case hazard (historical + future)
+
+### 8. CCART Number
+
+    - Final hazard‑change metric
+
 ---
 
-## 🧪 Scientific Principles
+## 📥 Ingestion Subsystem (Summary)
 
-CCART‑Floods is built on four core principles:
+### CHIRPS Ingestion
 
-**1. Empirical honesty**
+- Daily rasters
+- Cleans values
+- Builds canonical CHIRPS grid
+- Provides `load_day()`
 
-- No interpolation of susceptibility
-- No fabricated values in proxy basins
-- No smoothing across hydrological boundaries
+### Historical CHIRPS Loader
 
-**2. Reproducibility**
+- Loads CHIRPS Zarr
+- No preprocessing
+- Direct input to hazard engines
 
-- Deterministic outputs
-- `.npy` storage for all intermediate arrays
-- Year‑by‑year processing
+### CMIP6 Ingestion
 
-**3. Modularity**
+- Reads daily pr and tasmax
+- Converts units
+- Regrids to CHIRPS grid
+- Provides year‑wise loaders
 
-- Each subsystem is independent
-- Each file has a single responsibility
-- Documentation mirrors code structure
+Outputs are **directly consumable** by all hazard engines.
 
-**4. Transparency**
-
-- Explicit formulas
-- Clear assumptions
-- Open‑source architecture
-
-**🚀 Quick Start Example**
-
-```python
-from ccart.flood.chirps.compute_metrics import compute_baseline_metrics
-from ccart.flood.fsi.build_fsi_v1_2 import build_fsi_v1_2
-from ccart.flood.fsi.rasterise_fsi import rasterise_clean_rescale_fsi
-from ccart.flood.hazard.hazard_engine import compute_historical_hazard
-from ccart.flood.fsi.build_fsi_v1_1 import build_fsi_v1_1
-
-# 1. Rainfall metrics
-p95 = compute_baseline_metrics(1995, 2024, rx2day_dir, p95_path)
-
-# 2. Susceptibility
-gdf_v1_2 = build_fsi_v1_2(build_fsi_v1_1())
-fsi_rescaled = rasterise_clean_rescale_fsi(gdf_v1_2, chirps_transform, shape)
-
-# 3. Hazard
-compute_historical_hazard(rx2day_dir, p95, fsi_rescaled, out_dir)
-```
 ---
 
-## 📌 Status
+## 🌊 FSI Subsystem (Summary)
 
-The CCART‑Floods module is being updated to be:
+### FSI v1.1 — Empirical IndoFloods Susceptibility
 
-- fully modularised
-- scientifically defensible
-- reproducible end‑to‑end
-- ready for open‑source release
+- Geomorphology + soils + climate.
 
-This is now a multi‑hazard‑ready subsystem that matches the maturity of the cyclone module.
+### FSI v1.2 — Hydrology‑Enhanced
+
+- HYBAS L06 + upstream area + proxy masking.
+
+### Rasterisation
+
+- Basin‑wise → CHIRPS grid → rescale 0–1.
+
+### Final Output
+
+`ccart_floods_fsi_static_chirps_rescaled.tif`
+
+---
+
+## ⚡ Hazard Engines (Summary)
+
+### Historical Hazard
+
+```
+H_y_historical = N_exceed_y * FSI_static
+```
+
+
+### Future Hazard
+
+```
+H_y_future = N_exceed_y * FSI_uplift
+```
+
+### Hazard‑Max (Historical)
+
+```
+H_max_historical = max( H_y_historical for all years 1995–2024 )
+```
+
+
+### Hazard‑Max (Future)
+
+```
+H_max_future = max( H_y_future for all years 2027–2100 )
+```
+
+---
+
+## 🔥 CCART Number 
+
+### CCART Number (Final Metric)
+
+```
+CCART_Number = H_max_future / H_max_historical
+```
+Where:
+
+- `H_max_historical` = worst flood‑hazard year in 1995–2024  
+- `H_max_future` = worst flood‑hazard year in 2027–2100 (scenario‑conditioned)
+
+This is the **primary output** of CCART‑Floods.
+
+## 📦 Canonical Directory Structure
+
+```
+ccart-floods/
+    ingest/
+    fsi/
+    hazard/
+    outputs/
+        hazard_hist_annual/
+        hazard_ssp370_annual/
+        hazard_ssp585_annual/
+        hazard_hist_max/
+        hazard_max/
+        ccart_number/
+```
+
+---
+
+## ⚠️ Known Limitations
+
+### INDOFLOODS Coverage
+The public INDOFLOODS dataset excludes Ganga and 
+Brahmaputra basin data. As a result:
+
+| State | FSI Coverage | Note |
+|-------|-------------|------|
+| Bihar | 0.3% | Ganga basin — data pending |
+| Uttarakhand | 0.0% | No coverage |
+| Punjab | 0.0% | No coverage |
+| Haryana | 0.0% | No coverage |
+| Uttar Pradesh | 5.2% | Sparse coverage |
+| Maharashtra | 42.9% | Western Ghats gap |
+
+Complete INDOFLOODS data available on request 
+from authors. FSI v2.0 will incorporate this 
+when available.
+
+### Single CMIP6 Model
+CCART-Floods uses ACCESS-CM2 (single model).
+Multi-model ensemble and Taylor diagram 
+validation are planned for v2.0.
+
+### No Hydrodynamic Modelling
+FSI is a susceptibility index — not flood depth.
+Engineering-grade depth modelling requires 
+DEM + drainage network (planned for urban module).
 
 ---
 
 ## 📚 References
 
-### INDOFLOODS — Flood Susceptibility & Catchment Attributes (Primary Source)
-
-Kuntla, S. K., & Saharia, M. (2025).  
+Kuntla, S. K., & Saharia, M. (2025).
 INDOFLOODS: A comprehensive database for flood events in India enhanced with catchment attributes.  
 Bulletin of the American Meteorological Society, 106(2), E333–E343.
 https://doi.org/10.1175/BAMS-D-24-0008.1
 
-Kuntla, S. K., & Saharia, M. (2025).  
+Kuntla, S. K., & Saharia, M. (2025).
 INDOFLOODS: A Comprehensive Database for Flood Events in India Enhanced with Catchment Attributes [Data set].
-Zenodo.
-https://doi.org/10.5281/zenodo.14584654
-
-Note: The public Zenodo release explicitly states that the Ganga and Brahmaputra basins are excluded. This is the reason for low FSI coverage in Bihar, Uttar Pradesh, Uttarakhand, Assam, and parts of Bengal.
-
-### Other references
-
-Rainfall & Climate Forcing
-CHIRPS — Climate Hazards Group InfraRed Precipitation with Station Data  
-Funk, C., Peterson, P., Landsfeld, M., et al. (2015).
-The climate hazards infrared precipitation with stations—a new environmental record for monitoring extremes.  
-Scientific Data, 2, 150066.
-https://doi.org/10.1038/sdata.2015.66 (doi.org in Bing)
-
-CMIP6 — Coupled Model Intercomparison Project Phase 6  
-Eyring, V., Bony, S., Meehl, G. A., et al. (2016).
-Overview of the Coupled Model Intercomparison Project Phase 6 (CMIP6) experimental design and organization.  
-Geoscientific Model Development, 9, 1937–1958.
-https://doi.org/10.5194/gmd-9-1937-2016 (doi.org in Bing)
-
-Flood Susceptibility & Hydrology
-INDOFLOODS — India Flood Susceptibility Dataset  
-Bhunia, G. S., Shit, P. K., Pourghasemi, H. R., et al. (2023).
-INDOFLOODS: A national‑scale flood susceptibility dataset for India.  
-Zenodo.
-https://doi.org/10.5281/zenodo.10036642 (doi.org in Bing)
-
-Note: Public version excludes Ganga & Brahmaputra basins.
-
-HydroBASINS — Global Hydrological Basins  
-Lehner, B., Grill, G. (2013).
-Global river hydrography and network routing: baseline data and new approaches to study the world’s large river systems.  
-Hydrological Processes, 27(15), 2171–2186.
-https://www.hydrosheds.org
-
-Extreme Rainfall Metrics
-Rx2day & Percentile Thresholds  
-Alexander, L. V., Zhang, X., Peterson, T. C., et al. (2006).
-Global observed changes in daily climate extremes of temperature and precipitation.  
-Journal of Geophysical Research, 111(D5).
-https://doi.org/10.1029/2005JD006290 (doi.org in Bing)
-
-Climate‑Conditioned Hazard Modelling
-Hazard Ratio Methods (Rainfall / Percentile Threshold)  
-Kharin, V. V., Zwiers, F. W., Zhang, X., & Hegerl, G. C. (2007).
-Changes in temperature and precipitation extremes in the IPCC ensemble of global coupled model simulations.  
-Journal of Climate, 20(8), 1419–1444.
-https://doi.org/10.1175/JCLI4066.1
-
-General Open‑Science & Reproducibility
-Peng, R. D. (2011).
-Reproducible research in computational science.  
-Science, 334(6060), 1226–1227.
-https://doi.org/10.1126/science.1213847 (doi.org in Bing)
+Zenodo. https://doi.org/10.5281/zenodo.14584654

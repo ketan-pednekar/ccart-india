@@ -15,23 +15,6 @@ Outputs:
 """
 
 import rasterio
-"""
-CCART FSI Uplift Engine (CHIRPS-aligned grid, Indo-Floods mask preserved)
-
-FSI_uplift = FSI_static * (Rx2max_future / P95)
-
-Inputs:
-- ccart_floods_fsi_rescaled.tif (static FSI, CHIRPS grid, NaN outside Indo-Floods)
-- p95_chirps_2day.tif
-- rx2max_ssp370_2027_2100_chirps.tif
-- rx2max_ssp585_2027_2100_chirps.tif
-
-Outputs:
-- fsi_uplift_ssp370.tif
-- fsi_uplift_ssp585.tif
-"""
-
-import rasterio
 import numpy as np
 from pathlib import Path
 
