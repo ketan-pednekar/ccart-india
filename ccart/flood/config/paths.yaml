@@ -8,7 +8,7 @@ data:
     precip:    "ccart/data/INDOFLOODS/precipitation_variables_indofloods.csv"
 
   hybas: "ccart/data/HYBAS/hybas_as_lev06_v1c.shp"
-  india_boundary: "ccart/data/boundaries/INDIA_DISTRICTS_FIXED.gpkg"
+  india_boundary: "ccart/data/boundaries/INDIA_OUTLINE_NOHOLES.gpkg"
 
 chirps:
   root: "D:/Climate Risk Data/CHIRPS_daily"
@@ -36,33 +36,40 @@ outputs:
 
 flood:
   inputs:
+    # Static susceptibility (CHIRPS-aligned)
     fsi: "ccart/flood/outputs/fsi/ccart_floods_fsi_static_chirps_rescaled.tif"
+
+    # Historical intensity threshold
     p95: "ccart/flood/outputs/p95/p95_chirps_2day.tif"
 
-    # CMIP6 rainfall
+    # CMIP6 rainfall (future)
     pr_370: "ccart/outputs/cmip6_ssp_india_fixed/ACCESS-CM2/ssp370/pr.zarr"
     pr_585: "ccart/outputs/cmip6_ssp_india_fixed/ACCESS-CM2/ssp585/pr.zarr"
 
-    # CHIRPS historical rainfall (NEW)
+    # CHIRPS historical rainfall
     chirps_daily: "D:/Climate Risk Data/CHIRPS_daily"
     pr_hist: "ccart/outputs/chirps_india/chirps_india_clipped.zarr"
 
-
-    # FSI uplift
+    # FSI uplift outputs
     fsi_uplift_370: "ccart/flood/outputs/fsi_uplift/fsi_uplift_ssp370.tif"
     fsi_uplift_585: "ccart/flood/outputs/fsi_uplift/fsi_uplift_ssp585.tif"
 
-    # CHIRPS India clipped (existing)
+    # CHIRPS India clipped
     chirps_india_zarr: "ccart/outputs/chirps_india/chirps_india_clipped.zarr"
 
     # Exposure
     exposure: "E:/EMC_BUILT_INDIA_005deg_CLIPPED.tif"
 
+    # ---------------------------------------------------------
+    # CORRECT: aggregated Rx2max (intensity ratio inputs)
+    # ---------------------------------------------------------
+    rx2_370: "ccart/flood/outputs/rx2/period_max/rx2max_ssp370_2027_2100_chirps.tif"
+    rx2_585: "ccart/flood/outputs/rx2/period_max/rx2max_ssp585_2027_2100_chirps.tif"
+
   outputs:
     hazard_annual: "ccart/flood/outputs/hazard/annual"
     hazard_max:    "ccart/flood/outputs/hazard/max"
 
-    # NEW: historical hazard outputs
     hazard_hist_annual: "ccart/flood/outputs/hazard_hist/annual"
     hazard_hist_max:    "ccart/flood/outputs/hazard_hist/max"
 
@@ -76,3 +83,5 @@ flood:
     rx2_period_max: "ccart/flood/outputs/rx2/period_max"
 
     fsi_static: "ccart/flood/outputs/fsi/ccart_floods_fsi_static_chirps_rescaled.tif"
+
+

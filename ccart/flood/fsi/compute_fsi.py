@@ -38,7 +38,7 @@ INDIA_SHP     = project_root / paths["data"]["india_boundary"]
 
 
 # ============================================================
-# NEW: Basin name cleaning + audit
+# Basin name cleaning + audit
 # ============================================================
 
 def clean_basin_names(df):
@@ -102,10 +102,10 @@ def compute_fsi_v1_1() -> gpd.GeoDataFrame:
     df_catch = pd.read_csv(CATCHMENT_CSV)
     df_meta  = pd.read_csv(META_CSV)
 
-    # NEW: Clean basin names BEFORE merging
+    # Clean basin names BEFORE merging
     df_meta = clean_basin_names(df_meta)
 
-    # NEW: Audit basin names (optional, comment out later)
+    # Optional: audit basin names (can be commented out later)
     audit_basin_names(df_meta)
 
     num_cols = [
@@ -141,6 +141,12 @@ def compute_fsi_v1_1() -> gpd.GeoDataFrame:
     geometry = [Point(xy) for xy in zip(df["Longitude"], df["Latitude"])]
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
 
+    # --------------------------------------------------------
+    # NEW: Mask gauges to India (Option A: point-level masking)
+    # --------------------------------------------------------
+    india = gpd.read_file(INDIA_SHP).to_crs("EPSG:4326")
+    gdf = gdf[gdf.within(india.unary_union)]
+
     return gdf
 
 
@@ -154,12 +160,13 @@ def compute_fsi_v1_2(gdf_v1_1: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     gdf_hybas = gpd.read_file(HYBAS_SHP).to_crs("EPSG:4326")
     india = gpd.read_file(INDIA_SHP).to_crs("EPSG:4326")
 
-    # Keep only basins intersecting India
+    # Keep only basins intersecting India (hydrological domain)
     gdf_hybas = gdf_hybas[gdf_hybas.intersects(india.unary_union)]
 
-    # Identify empirical vs proxy basins
-    points_in_india = gdf_v1_1[gdf_v1_1.within(india.unary_union)]
+    # Points are already masked to India in v1.1
+    points_in_india = gdf_v1_1  # already within India
 
+    # Identify empirical vs proxy basins
     join = gpd.sjoin(
         gdf_hybas[["HYBAS_ID", "geometry"]].reset_index(drop=True),
         points_in_india[["GaugeID", "geometry"]].reset_index(drop=True),
@@ -177,7 +184,7 @@ def compute_fsi_v1_2(gdf_v1_1: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     gdf_hybas["n_gauges"] = gdf_hybas["n_gauges"].fillna(0)
     gdf_hybas["Proxy_flag"] = np.where(gdf_hybas["n_gauges"] == 0, 1, 0)
 
-    # Spatial join: assign hydrological attributes
+    # Spatial join: assign hydrological attributes to points
     gdf_join = gpd.sjoin(
         gdf_v1_1.reset_index(drop=True),
         gdf_hybas[["HYBAS_ID", "UP_AREA", "SUB_AREA", "ORDER", "Proxy_flag", "geometry"]],
@@ -196,13 +203,14 @@ def compute_fsi_v1_2(gdf_v1_1: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         gdf_join["UP_AREA_norm"] * 0.5
     ).clip(0, 1)
 
-    # Apply empirical mask
+    # Apply empirical mask (proxy basins → NaN)
     gdf_join["FSI_masked"] = np.where(
         gdf_join["Proxy_flag"] == 1,
         np.nan,
         gdf_join["FSI_v1_2"]
     )
 
+    # Points are already India-only; no further political masking needed here
     return gdf_join
 
 

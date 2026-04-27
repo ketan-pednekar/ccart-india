@@ -56,6 +56,7 @@ def main():
     # Inputs
     chirps_template = project_root / paths["chirps"]["template"]
     hybas_path = project_root / paths["data"]["hybas"]
+    india_path = project_root / paths["data"]["india_boundary"]
 
     # Output (canonical static FSI)
     out_path = project_root / paths["flood"]["outputs"]["fsi_static"]
@@ -82,6 +83,7 @@ def main():
         chirps_transform=chirps_transform,
         shape=shape,
         hybas_path=hybas_path,
+        india_path=india_path
     )
     print("  FSI rasterised and rescaled to 0–1 on CHIRPS grid.")
 

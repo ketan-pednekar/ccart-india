@@ -3,53 +3,10 @@ Module: rasterise_fsi
 CCART-Floods Framework
 -------------------------------------------------------------
 
-Purpose
--------
-Rasterises the Flood Susceptibility Index (FSI) onto the CHIRPS India
-0.05° grid using **basin-wise assignment** based on HYBAS L06 polygons.
-
-This is the canonical CCART-Floods method for generating a continuous,
-hydrologically meaningful susceptibility surface. IndoFloods gauge-level
-FSI values are first joined to their corresponding HYBAS basins, then
-each basin's FSI is rasterised across all pixels within that basin.
-
-This replaces point burn-in rasterisation and ensures:
-    - complete India-wide coverage (no gaps inside India)
-    - hydrologically consistent susceptibility fields
-    - perfect alignment with the CHIRPS India grid
-    - suitability for downstream hazard and risk modelling
-
-Pipeline
---------
-1. Spatially join IndoFloods gauge FSI to HYBAS basins
-2. Aggregate FSI per basin (mean of gauges within basin)
-3. Rasterise HYBAS polygons onto CHIRPS grid
-4. Clean and rescale raster to 0–1
-5. Return CHIRPS-aligned susceptibility raster
-
-Inputs
-------
-gdf_fsi : GeoDataFrame
-    Output of compute_fsi(), containing gauge locations and FSI_masked.
-chirps_transform : affine.Affine
-    Transform of the CHIRPS India 0.05° grid.
-shape : (rows, cols)
-    Shape of the CHIRPS India grid.
-hybas_path : str or Path
-    Path to HYBAS L06 polygon file.
-
-Outputs
--------
-fsi_rescaled : 2D numpy array (float32)
-    Basin-wise susceptibility raster aligned to CHIRPS grid,
-    with values in the range 0–1 and NaN outside India.
-
-Notes
------
-- HYBAS L06 is required for hydrologically meaningful basin assignment.
-- FSI_masked must contain NaN for ungauged basins.
-- Rasterisation uses rasterio.features.rasterize().
-- This module produces the canonical CCART-Floods static FSI layer.
+Leak-proof version:
+    - HYBAS polygons are clipped to India BEFORE rasterisation
+    - Ensures no leakage in Siliguri Corridor, Bangladesh, Nepal, Bhutan
+    - Guarantees FSI raster is India-only by geometry and by value
 """
 
 from typing import Tuple
@@ -63,33 +20,56 @@ def rasterise_clean_rescale_fsi(
     chirps_transform,
     shape: Tuple[int, int],
     hybas_path,
+    india_path=None,
 ):
     """
     Basin-wise rasterisation of FSI:
     1. Join gauge FSI to HYBAS basins
-    2. Rasterise HYBAS polygons onto CHIRPS grid
-    3. Rescale to 0–1
+    2. CLIP HYBAS polygons to India (critical fix)
+    3. Rasterise HYBAS polygons onto CHIRPS grid
+    4. Rescale to 0–1
     """
-    # 1. Load HYBAS
+
+    # ---------------------------------------------------------
+    # 1. Load HYBAS + India boundary
+    # ---------------------------------------------------------
     hybas = gpd.read_file(hybas_path)
 
-    # FIX: remove leftover index_right columns
+    if india_path is None:
+        raise ValueError("india_path must be provided for leak-proof rasterisation.")
+
+    india = gpd.read_file(india_path)
+
+    # CRS safety
+    if hybas.crs != india.crs:
+        india = india.to_crs(hybas.crs)
+
+    if gdf_fsi.crs != hybas.crs:
+        gdf_fsi = gdf_fsi.to_crs(hybas.crs)
+
+    # Remove leftover join artifacts
     for df in (hybas, gdf_fsi):
         if "index_right" in df.columns:
             df.drop(columns=["index_right"], inplace=True)
 
-    # FIX: ensure CRS match
-    if gdf_fsi.crs != hybas.crs:
-        gdf_fsi = gdf_fsi.to_crs(hybas.crs)
-
-    # 2. Spatial join: assign each gauge to its HYBAS basin
-    gdf_joined = gpd.sjoin(gdf_fsi, hybas, how="left", predicate="intersects")
+    # ---------------------------------------------------------
+    # 2. CLIP HYBAS polygons to India (THE FIX)
+    # ---------------------------------------------------------
+    hybas = gpd.overlay(hybas, india, how="intersection")
 
     # ---------------------------------------------------------
-    # Robust HYBAS basin-ID detection (CCART standard)
+    # 3. Spatial join: assign each gauge to its HYBAS basin
     # ---------------------------------------------------------
+    gdf_joined = gpd.sjoin(
+        gdf_fsi,
+        hybas,
+        how="left",
+        predicate="intersects"
+    )
 
-    # Step 1 — detect basin ID column from HYBAS polygons
+    # ---------------------------------------------------------
+    # 4. Detect basin ID column
+    # ---------------------------------------------------------
     possible_cols = [
         "HYBAS_ID", "HYBAS_ID_1", "HYBAS_ID_12", "HYBAS_ID_6",
         "MAIN_BAS", "PFAF_ID"
@@ -107,7 +87,6 @@ def rasterise_clean_rescale_fsi(
             f"Available columns: {list(hybas.columns)}"
         )
 
-    # Step 2 — after spatial join, GeoPandas appends '_left'
     joined_basin_col = basin_id + "_left"
 
     if joined_basin_col not in gdf_joined.columns:
@@ -116,41 +95,44 @@ def rasterise_clean_rescale_fsi(
             f"Available columns: {list(gdf_joined.columns)}"
         )
 
-    # Use this consistently
-    basin_col = joined_basin_col
-
-    # 3. Aggregate FSI per basin
+    # ---------------------------------------------------------
+    # 5. Aggregate FSI per basin
+    # ---------------------------------------------------------
     basin_fsi = (
         gdf_joined
-        .groupby(basin_col)["FSI_masked"]
+        .groupby(joined_basin_col)["FSI_masked"]
         .mean()
         .reset_index()
     )
 
-    # 4. Merge back into HYBAS polygons
+    # ---------------------------------------------------------
+    # 6. Merge FSI back into clipped HYBAS polygons
+    # ---------------------------------------------------------
     hybas_fsi = hybas.merge(
         basin_fsi,
         left_on=basin_id,
-        right_on=basin_col,
+        right_on=joined_basin_col,
         how="left"
     )
 
-
-    # 5. Build shapes list: (geometry, FSI value)
-    # Ensure FSI column exists after merge
     if "FSI_masked" not in hybas_fsi.columns:
         raise ValueError(
             f"'FSI_masked' column missing after merge. "
             f"Available columns: {list(hybas_fsi.columns)}"
         )
 
+    # ---------------------------------------------------------
+    # 7. Build shapes list for rasterisation
+    # ---------------------------------------------------------
     shapes = [
         (geom, val)
         for geom, val in zip(hybas_fsi.geometry, hybas_fsi["FSI_masked"])
         if val is not None and not np.isnan(val)
     ]
 
-    # 6. Rasterise to CHIRPS grid
+    # ---------------------------------------------------------
+    # 8. Rasterise to CHIRPS grid
+    # ---------------------------------------------------------
     fsi_raster = rasterize(
         shapes=shapes,
         out_shape=shape,
@@ -159,7 +141,9 @@ def rasterise_clean_rescale_fsi(
         dtype="float32",
     )
 
-    # 7. Rescale 0–1
+    # ---------------------------------------------------------
+    # 9. Rescale 0–1
+    # ---------------------------------------------------------
     valid = ~np.isnan(fsi_raster)
     if not np.any(valid):
         raise ValueError("FSI rasterisation produced no valid pixels.")
