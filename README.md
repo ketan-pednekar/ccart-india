@@ -202,6 +202,10 @@ Where:
 
 The **CCART Number** is the **headline metric** of CCART‑Floods and the key output of the module.
 
+### Known Limitations - INDOFLOODS Coverage Gap
+The Ganga and Brahmaputra basin data in INDOFLOODS is restricted by source agencies: CWC, NWIC, and 
+Ministry of Jal Shakti. The INDOFLOODS authors confirmed this restriction directly. FSI v2.0 will 
+incorporate this data when access is obtained through appropriate channels.
 
 ### 📄 Full documentation  
 

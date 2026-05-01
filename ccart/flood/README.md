@@ -278,9 +278,10 @@ Brahmaputra basin data. As a result:
 | Uttar Pradesh | 5.2% | Sparse coverage |
 | Maharashtra | 42.9% | Western Ghats gap |
 
-Complete INDOFLOODS data available on request 
-from authors. FSI v2.0 will incorporate this 
-when available.
+### INDOFLOODS Coverage Gap
+The Ganga and Brahmaputra basin data in INDOFLOODS is restricted by source agencies: CWC, NWIC, and 
+Ministry of Jal Shakti. The INDOFLOODS authors confirmed this restriction directly. FSI v2.0 will 
+incorporate this data when access is obtained through appropriate channels.
 
 ### Single CMIP6 Model
 CCART-Floods uses ACCESS-CM2 (single model).
