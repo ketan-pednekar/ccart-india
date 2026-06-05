@@ -42,7 +42,7 @@ The pipeline handles the rest.
 
 The architecture is:
 
-- modular — each hazard is a standalone subsystem  
+- modular — each hazard is a standalone subsystem
 - transparent — explicit formulas, assumptions, and data sources  
 - reproducible — deterministic outputs, config‑driven paths  
 - country‑agnostic — India is the reference, not the limit  
@@ -102,7 +102,7 @@ ccart-india/
 |-------------------|----------|-------------|
 | `cyclone/`        | Mature   | Historical + synthetic cyclone engine (v2) |
 | `flood/`          | Updated  | Climate‑conditioned flood hazard engine (v1.1) |
-| `heat/`           | In Progress  | WBT + TXx + population exposure (v4) |
+| `heat/`           | Updated  | WBT + TXx + population exposure (v4) |
 | `exposure/`       | Utility  | Shared exposure preprocessing tools |
 | `vulnerability/`  | Utility  | Damage functions + vulnerability curves |
 | `calibration/`    | Utility  | DLNA + calibration utilities |
@@ -409,7 +409,7 @@ CCART is built on four non‑negotiable principles:
 
 - **CCART‑Cyclone** (historical + synthetic)
 - **CCART‑Floods** (frequency‑based hazard + CCART Number)
-- **Heat module** (planned, tasmax anomalies, WBT)
+- **Heat module** (tasmax anomalies, WBT)
 
 ### Impact & Calibration
 
