@@ -1,0 +1,33 @@
+heat:
+
+  data_root: "E:/Heat/Data"
+
+  boundaries:
+    districts: "C:/CMIP_data/cmip6/Climada/Projects/ccart-india/ccart/data/boundaries/INDIA_DISTRICTS_FIXED.gpkg"
+    india_outline: "C:/CMIP_data/cmip6/Climada/Projects/ccart-india/ccart/data/boundaries/INDIA_OUTLINE_STRICT.gpkg"
+
+  builtup: "exposure/EMC_BUILT_INDIA_005deg_CLIPPED.tif"
+
+  ingested:
+    hist: "Heat/ingested/hist"
+    ssp370: "Heat/ingested/ssp370"
+    ssp585: "Heat/ingested/ssp585"
+
+  hazard:
+    historical: "Heat/outputs/CCART_Hazard_WBT35_Historical_1995-2014.tif"
+    near_term: "Heat/outputs/CCART_Hazard_WBT35_NearTerm_2027-2039.tif"
+    mid_century: "Heat/outputs/CCART_Hazard_WBT35_MidCentury_2040-2069.tif"
+    end_century: "Heat/outputs/CCART_Hazard_WBT35_EndCentury_2081-2100.tif"
+
+  outputs:
+    district_timeslices: "Heat/outputs/district_timeslices"
+    viz: "Heat/outputs/viz"
+    timeslices: "Heat/outputs/timeslices_wbt35"
+    timeslice_cubes: "Heat/outputs/timeslice_cubes"
+    tasmax_cubes:        "Heat/outputs/tasmax_cubes" 
+    wbt_cubes:           "Heat/outputs/wbt_cubes"          
+    hazard_cubes:        "Heat/outputs/hazard_cubes"
+           
+  exceedance: "Heat/outputs/exceedance"
+
+  cache: "Heat/cache"

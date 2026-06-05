@@ -15,7 +15,7 @@ chirps:
   daily_dir: "D:/Climate Risk Data/CHIRPS_daily"
   template: "ccart/outputs/chirps_india/chirps_india_template.tif"
   clip_to_region: true
-  region_boundary: "ccart/data/boundaries/INDIA_DISTRICTS_FIXED.gpkg"
+  region_boundary: "ccart/data/boundaries/INDIA_OUTLINE_NOHOLES.gpkg"
 
 cmip6:
   processed_dir: "ccart/outputs/cmip6_ssp_india_fixed"
@@ -29,6 +29,17 @@ cmip6:
       pr_dir: "D:/Climate Risk Data/CMIP6_daily/ACCESS-CM2/SSP585"
       tasmax_dir: "E:/Heat/Data/ssp585/tasmax"
 
+  MPI-ESM1-2-HR:
+    ssp370:
+      pr_dir: "E:/CMIP_data/cmip6/MPI-ESM1-2-HR/ssp370/pr"
+      out_dir: "ccart/outputs/cmip6_ssp_india_fixed/MPI-ESM1-2-HR/ssp370"
+
+      # keep global where it actually is
+      pr_global_zarr: "ccart/outputs/mpi_pr_ssp370.zarr"
+
+      # write India-only into the structured CMIP6 folder
+      pr_india_zarr:  "ccart/outputs/cmip6_ssp_india_fixed/MPI-ESM1-2-HR/ssp370/pr_india.zarr"
+        
 outputs:
   root: "ccart/flood/outputs"
   fsi: "ccart/flood/outputs/fsi"

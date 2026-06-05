@@ -17,12 +17,12 @@ from ccart.cyclone.synthetic.run_batch import run_batch
 # User paths (edit these for your environment)
 # ---------------------------------------------------------
 
-DISTRICTS = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\ccart\data\boundaries\INDIA_DISTRICTS_FIXED.gpkg"
-COASTLINE = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\ccart\data\coastline\coastl_ind.shp"
-WEALTH = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\ccart\data\wealth\wealth_by_district.csv"
-TRACKS = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\ccart\data\historical_tracks\ni_tracks_climada_1950_2023_cleaned.h5"
+DISTRICTS = r"C:\CMIP_data\cmip6\Climada\Projects\ccart-india\ccart\data\boundaries\INDIA_DISTRICTS_FIXED.gpkg"
+COASTLINE = r"C:\CMIP_data\cmip6\Climada\Projects\ccart-india\ccart\data\coastline\coastl_ind.shp"
+WEALTH = r"C:\CMIP_data\cmip6\Climada\Projects\ccart-india\ccart\data\wealth\wealth_by_district.csv"
+TRACKS = r"C:\CMIP_data\cmip6\Climada\Projects\ccart-india\ccart\data\historical_tracks\ni_tracks_climada_1950_2023_cleaned.h5"
 
-OUTPUT_ROOT = r"C:\CMIP data\cmip6\Climada\Projects\ccart-india\ccart\cyclone\outputs"
+OUTPUT_ROOT = r"E:\ccart_cyclone_outputs"
 
 # ---------------------------------------------------------
 # Load spatial + exposure data
@@ -45,7 +45,7 @@ impf_set = build_vulnerability_curves()
 # ---------------------------------------------------------
 
 run_batch(
-    n_runs_per_scenario=5,
+    n_runs_per_scenario=500,
     exposures=exposures,
     districts_gdf=districts_gdf,
     coastline_gdf=coastline_gdf,

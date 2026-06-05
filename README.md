@@ -2,7 +2,7 @@
 
 # CCART — Country‑Agnostic Climate Risk Framework
 
-*India Implementation (v3.1) — Cyclone + Flood (v1.1) + Heat (in progress)*
+*India Implementation (v4) — Cyclone + Flood (v1.1) + Heat* 
 
 **Anyone can add, critique, or modify — in order to get closer to the truth.**
 
@@ -213,6 +213,143 @@ incorporate this data when access is obtained through appropriate channels.
 
 ---
 
+## 🔥 Heat Module (v4 Engine — WBT35, TXx)
+
+The CCART‑Heat module is a full wet‑bulb temperature (WBT) and heat‑extreme hazard engine for India.
+
+It is built to be modular, transparent, and fully reproducible, following the same architectural principles as Cyclone and Flood.
+
+The module produces:
+
+- Daily WBT (wet‑bulb temperature) from CMIP6 variables
+- Annual exceedance cubes (e.g., days > 35°C WBT)
+- Time‑slice hazard cubes (e.g., 2081–2100)
+- GeoTIFF hazard layers for mapping and GIS workflows
+- District‑level exceedance summaries
+- Strict India masks for spatial consistency
+
+It is the third major hazard engine in CCART, after Cyclone and Flood.
+
+### 🔧 Core Components
+
+#### 1. Ingestion Layer
+
+Uses CMIP6 variables:
+
+- tas (air temperature)
+- hurs (relative humidity)
+- tasmax (for TXx, if needed)
+- wbt (added later via add_wbt_to_ingested.py)
+
+All ingested into standardized Zarr cubes under:
+
+```
+ccart/Heat/ingested/
+```
+
+#### 2. WBT Engine
+
+Computes daily wet‑bulb temperature using a scientifically validated formulation.
+
+Outputs:
+
+```
+WBT(time, lat, lon)
+```
+
+#### 3. Exceedance Engine
+
+Computes:
+
+```
+exceed(year) = count of days where WBT > 35°C
+```
+Produces annual exceedance cubes for:
+
+- hist
+- ssp370
+- ssp585
+
+#### 4. Time‑Slice Hazard Cubes
+
+Extracts 20‑year windows (e.g., 2081–2100) and computes:
+
+- max exceedance
+- mean exceedance
+- district‑level exceedance
+
+Saved under:
+
+```
+ccart/Heat/outputs/timeslice_cubes/
+```
+
+#### 5. GeoTIFF Export
+
+Exports north‑up, GIS‑ready TIFFs:
+
+```
+ccart/Heat/outputs/timeslices_wbt35/
+```
+
+#### 6. Validation Suite
+
+Located in:
+
+```
+ccart/Heat/utils/
+```
+
+Includes:
+
+- Ingested cube validator
+- Time‑slice cube validator
+- Time‑slice TIFF validator
+- Strict India mask generator
+- Orientation diagnostics
+- District‑level exceedance checks
+
+This ensures no flipped rasters, no CRS mismatches, no misaligned grids.
+
+---
+
+### 📈 Primary Outputs
+
+- Annual exceedance cubes (Tw > 35°C)
+- Time‑slice hazard cubes (e.g., 2081–2100)
+- GeoTIFF hazard layers
+- District‑level exceedance tables
+- Strict India mask
+
+These outputs are designed for:
+
+- climate‑risk analysis
+- adaptation planning
+- heat‑stress mapping
+- exposure modelling
+- multi‑hazard integration
+
+---
+
+### 🧪 Scientific Notes
+
+- WBT is computed using a physically consistent formulation (Stull (2011))
+- All hazards are regridded to a 0.05° India grid
+- CMIP6 native resolution remains ~175 km (ACCESS‑CM2 N96)
+- Outputs are directional indicators, not forecasts
+- All orientation logic is explicitly documented
+- All validators are open and reproducible
+
+---
+
+### 📄 Full documentation
+
+```
+ccart/Heat/README.md
+```
+
+---
+
 ## 🧩 CCART — Unified Multi‑Hazard Architecture
 
 CCART is not just a cyclone engine or a flood engine — it is a **country‑agnostic, modular, multi‑hazard climate‑risk framework**.
@@ -316,3 +453,18 @@ IBTrACS — Knapp et al. (2010). The International Best Track Archive for Climat
 
 ## Hazard Engine
 CLIMADA — Aznar‑Siguan & Bresch (2019). CLIMADA v1.
+
+## ⚠️ Disclaimer — Interpretation of CCART Outputs
+
+**CCART does not claim pinpoint accuracy.**  
+
+It provides **directional, physics‑based indicators** that help understand how climate‑related risks may shift under different scenarios.
+Outputs are **not predictions, forecasts, or guarantees** of future events.
+
+**ACCESS‑CM2** native atmospheric/land resolution is **~175 km (N96 grid), regridded to 0.05°** for consistency with the observational baseline. 
+The effective resolution of future projections remains **~175 km.**
+
+All methodology, data sources, assumptions, and limitations are fully documented,
+openly accessible, and independently verifiable.
+
+Users are encouraged to review the documentation and assess suitability for their specific applications.

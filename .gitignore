@@ -19,6 +19,7 @@ build/
 # NOTEBOOK CHECKPOINTS
 # ============================================================
 .ipynb_checkpoints/
+*.ipynb
 
 # ============================================================
 # CCART OUTPUTS (DO NOT PUSH)
@@ -27,6 +28,15 @@ outputs/
 synthetic_runs/
 synthetic_runs_multi/
 diagnostics/
+
+# Heat module outputs (DO NOT PUSH)
+ccart/Heat/outputs/
+ccart/Heat/viz/
+
+# Heat ingested Zarrs (DO NOT PUSH)
+ccart/Heat/ingested/hist/
+ccart/Heat/ingested/ssp370/
+ccart/Heat/ingested/ssp585/
 
 # Maps and generated visuals
 *.png
@@ -45,9 +55,7 @@ diagnostics/
 *.h5
 *.vrt
 *.aux.xml
-
-# Optional: ignore Zarr stores
-# *.zarr/
+*.zarr/
 
 # ============================================================
 # DATA FOLDER (IGNORE EVERYTHING HEAVY)
@@ -67,6 +75,9 @@ data/**/*.geojson
 
 # Allow small geojsons inside code folders (e.g., masks)
 !ccart/**/*.geojson
+
+# DEM masks (heavy)
+ccart/data/DEM_mask/
 
 # ============================================================
 # ENVIRONMENTS
@@ -96,8 +107,9 @@ Thumbs.db
 # logs/
 # *.csv
 
-#----------
-# gpkg files
-#-----------
-ccart/data/boundaries/*.gpkg
+# ============================================================
+# FLOOD MODULE (legacy config removed)
+# ============================================================
+ccart/flood/config/paths.yaml
+ccart/flood/config/flood_params.yaml
 
