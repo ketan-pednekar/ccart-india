@@ -468,3 +468,7 @@ All methodology, data sources, assumptions, and limitations are fully documented
 openly accessible, and independently verifiable.
 
 Users are encouraged to review the documentation and assess suitability for their specific applications.
+
+### Version History
+- v4.0 (June 2026): Added Heat module, updated Flood config, integrated Vulnerability
+- v3.1 (May 2026): Cyclone + Flood integration
